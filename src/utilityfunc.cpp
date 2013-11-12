@@ -2,6 +2,14 @@
 
 boost::random::mt19937 gen;
 
+int argmax(vector<double> & x) {
+  int maxind=0;
+  for(int i=1;i<x.size();i++) 
+    if(x[i]>x[maxind]) maxind=i;
+  return(maxind);
+}
+
+
 unsigned char**uc2hap() {
   int n = 256;
   unsigned char **ret = newMatrix<unsigned char>(n,8);
@@ -48,18 +56,18 @@ int randomInt(int a,int b) {
   return(randomthingy(gen));
 }
 
-unordered_set<int> sampleIndex(int k,int n) {
-  unordered_set<int> ret;
-  int idx;
+// unordered_set<int> sampleIndex(int k,int n) {
+//   unordered_set<int> ret;
+//   int idx;
 
-  for(int i=0;i<k;i++) {
-    idx = randomInt(0,n);
-    while(ret.count(idx))     idx = randomInt(0,n);
-    ret.insert(idx);
-  }
+//   for(int i=0;i<k;i++) {
+//     idx = randomInt(0,n);
+//     while(ret.count(idx))     idx = randomInt(0,n);
+//     ret.insert(idx);
+//   }
 
-  return(ret);
-}
+//   return(ret);
+// }
 
 int rbinom(int n,float p) {
   boost::random::binomial_distribution<> randomthingy(n,p);
@@ -172,4 +180,9 @@ void ofile::writeString(string & str) {
 void ofile::close() {
 	 if (!empty()) reset();
 	 fd.close();
+}
+
+bool fileexists(string fname){
+  ifstream ifile(fname.c_str());
+  return ifile;
 }

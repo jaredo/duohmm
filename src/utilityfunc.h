@@ -2,7 +2,7 @@
 #include <utility> 
 #include <vector>
 #include <bitset>
-#include <unordered_set>
+//#include <unordered_set>
 #include <boost/random/binomial_distribution.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int_distribution.hpp>
@@ -25,7 +25,7 @@ int getRandom(int n);
 int randomInt(int a,int b);
 int rbinom(int n,float p);
 
-unordered_set<int> sampleIndex(int k,int n);
+//unordered_set<int> sampleIndex(int k,int n);
 
 template <class T>
 bool comparator ( const pair<T,int>& l, const pair<T,int>& r)  { return l.first < r.first; };
@@ -116,3 +116,7 @@ public:
 	void writeString(string &);
 	void close();
 };
+
+bool fileexists(string fname);
+
+int argmax(vector<double> & x);

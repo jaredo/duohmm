@@ -12,22 +12,22 @@
 #include <iterator>
 #include "hapmodule.h"
 #include "pedigree.h"
+#include "hmm.h"
+#include "pedhap.h"
 #include <boost/progress.hpp>
 
 using namespace std;
 
 int main(int argc,char **argv) {
 
-	if(argc!=3) {
-		cout << "Usage: duohmm hapfile famfile --corrected output --recombination output --genotypingError output" << endl;
-		return(0);
-	}
+  if(argc!=4) {
+    cout << "Usage: duohmm hapfile famfile genetic_map --corrected output --recombination output --genotypingError output" << endl;
+    return(0);
+  }
 
-	cout << "Reading haplotypes from " << argv[1] <<".haps" << endl;
-	Haplotypes haps(argv[1]);
-
-	cout << "Reading pedigree information from " << argv[2] << endl;
-
-	pedigree p(argv[2]);
-	return 0;
+  pedhap ph(argv[1],argv[2],argv[3]);
+  ph.correct();
+  ph.haps->writeHaps(argv[1]);
+  return 0;
+  
 }
