@@ -12,6 +12,7 @@ Haplotypes::Haplotypes(const Haplotypes& h) {
 
 
 Haplotypes::Haplotypes(string filename) {
+  input_file = filename;
   ifstream inf1((filename+".sample").c_str());
   string line;
   int pos;
@@ -30,7 +31,7 @@ Haplotypes::Haplotypes(string filename) {
     }
     count++;
   }
-  cout << count << " lines in " << filename <<".sample"<< endl;
+  cout << count-2 << " individuals in " << filename <<".sample"<< endl;
   nhap = (count-2) * 2;
   allsamples.resize(nhap);
   for(int i=0;i<nhap;i++) allsamples[i] = i;
@@ -44,7 +45,7 @@ Haplotypes::Haplotypes(string filename) {
   while ( getline(inf2,line) ) {
     count ++;
   }
-  cout << count << " lines in " << filename <<".haps" << endl;
+  cout << count << " markers in " << filename <<".haps" << endl;
   nsnp = count;
   positions.resize(nsnp);
   rsid1.resize(nsnp);
@@ -74,11 +75,18 @@ Haplotypes::Haplotypes(string filename) {
     ref[i]=tmp;
     inf2 >> tmp;
     alt[i]=tmp;
-    //    cout << rsid1 << " "<< rsid2 << " " << pos << " " << ref << " " << alt << endl;
+    //    cout << rsid1[i] << " "<< rsid2[i] << " " << positions[i] << " " << ref[i] << " " << alt[i] << endl;
     //for(int j=0;j<5;j++) inf2.ignore(1000,' ');
     for(int j=0;j<nhap;j++) {
-      inf2 >> c;
-      H[j][i] = (unsigned char)atoi(&c);
+      unsigned   int hapval;
+      //      inf2 >> c;
+      //      H[j][i] = atoi(&c);
+      inf2 >> hapval;
+      H[j][i] = hapval;
+      if(!(H[j][i]==0 || H[j][i]==1)) {
+	cerr << "INVALID VALUE IN HAPLOTYPE FILE ON LINE " << i+1 << " COLUMN " << j+6 <<  "\n" << hapval << " " <<(unsigned int) H[j][i] << "\nExiting..."<<endl;
+	exit(1);
+      }
       if(DEBUG>0)      if(j<4 && i<20) cout << (int)H[j][i] << " ";
     }
     if(DEBUG>0)    if(i<20) cout << endl;
@@ -88,7 +96,7 @@ Haplotypes::Haplotypes(string filename) {
 }
 
 int Haplotypes::writeHaps(string fname) {
-  string outfname = fname + "-corrected.haps";
+  string outfname = fname + ".haps";
   if(fileexists(outfname)) {
     cerr << "ERROR: " << outfname<<" exists.  Will not overwrite.\nExiting..."<<endl;
     exit(1);
@@ -104,6 +112,17 @@ int Haplotypes::writeHaps(string fname) {
     }
     outf<<endl;
   }
+
+  string infname=input_file+".sample";
+  outfname = fname+".sample";
+  ifstream  src(infname.c_str(), std::ios::binary);
+  if(!src) {
+    cerr << "Probleam reading "<<infname <<endl;
+    exit(1);
+  }
+  ofstream  dst(outfname.c_str(),   std::ios::binary);
+  dst << src.rdbuf();
+
   return(0);
 }
 
@@ -113,6 +132,7 @@ Haplotypes::~Haplotypes() {
 }
 
 unsigned char **Haplotypes::getHap(string id){
+  assert(idlook.count(id));
   return(&H[idlook[id]*2]);
 }
 

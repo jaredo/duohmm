@@ -17,7 +17,7 @@ class Haplotypes {
   Haplotypes(const Haplotypes& h);
   ~Haplotypes();
   int writeHaps(string fname);
-
+  string input_file;
   unsigned char **getHap(string id);  
   vector<string> ids;
   vector<string> rsid1,rsid2,ref,alt;  
