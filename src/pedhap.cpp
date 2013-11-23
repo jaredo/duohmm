@@ -1,5 +1,4 @@
 #include "pedhap.h"
-#define DEBUG 0
 
 int unswitch(unsigned char **h,int start,int stop) {
   for(int l=start;l<stop;l++)  {
@@ -45,14 +44,14 @@ int pedhap::phase(string child) {
   assert(ped->sampleinfo.count(dad)  ||  ped->sampleinfo.count(mum));
   unsigned char **d,**m,**p;
   unsigned char **c = haps->getHap(child);
-  cout << child << " - " << dad << " - " << mum << endl;
+  cout << "Phasing " << child << " - " << dad << " - " << mum << endl;
   pair<string,string> key,key1,key2;
   if(dad.compare("0")!=0 && mum.compare("0")!=0) {
     d = haps->getHap(dad);
     m = haps->getHap(mum);
     //    cout << (int)d[0][0] << (int)d[0][1]<< (int)m[0][0]<< (int)m[0][1]<< (int)c[0][0] <<  (int)c[0][1] << endl;
     trio->setHaps(d,m,c);
-    trio->EM(10);
+    trio->EM(NITERATION);
     trio->viterbi();
     key1 = make_pair(dad,child);
     key2 = make_pair(mum,child);
@@ -76,7 +75,7 @@ int pedhap::phase(string child) {
       duo->setHaps(p,c,"2");
       key = make_pair(mum,child);
     }
-    duo->EM(10);
+    duo->EM(NITERATION);
     duo->viterbi();    
     stateseq[key] = duo->stateseq;
   } 
@@ -97,7 +96,7 @@ int pedhap::phase(string child) {
 
   if(dad.compare("0")!=0 && mum.compare("0")!=0) {
     trio->setHaps(d,m,c);
-    trio->EM(10);
+    trio->EM(NITERATION);
     trio->viterbi();
     for(int l=0;l<nsnp;l++) {
       unsigned char s = trio->stateseq[l];
@@ -106,36 +105,11 @@ int pedhap::phase(string child) {
     }
   } 
   else {
-    duo->EM(10);
+    duo->EM(NITERATION);
     duo->viterbi();    
     stateseq[key] = duo->stateseq;
   } 
-  /*
-  if(DEBUG>2) {
 
-    for(int l=0;l<nsnp;l++) {
-      int maxind = 0;
-      for(int i=1;i<4;i++) 
-	if(duo->posterior[i][l]>duo->posterior[maxind][l]) 
-	  maxind = i;
-      
-      if(duo->stateseq[l]!=maxind) {
-	cout << l << "\t" << haps->positions[l] << "\t" << (int)duo->stateseq[l];
-	for(int i=0;i<4;i++) 
-	  cout << " " << duo->posterior[i][l];
-	cout << endl;
-      }
-    }
-     cout << parent << " - " << child << endl;
-    cout << "haporder = "<<haporder<<endl;
-    cout << 0  << "\t"  << haps->positions[0] << "\t" << (int)duo->stateseq[0] << "\t" << (int)duo->stateseq[0]%2 << endl;
-    for(int l=0;l<nsnp-1;l++) 
-      if(duo->stateseq[l]!=duo->stateseq[l+1])  
-	cout << l << "\t" << haps->positions[l] << "\t" << (int)duo->stateseq[l+1]  << "\t" << (int)duo->stateseq[l+1]%2  << endl;
-    cout << nsnp-1   << "\t" << haps->positions[nsnp-1] << "\t" << (int)duo->stateseq[nsnp-1] << "\t" << (int)duo->stateseq[nsnp-1]%2 << endl;
-
-  }
-    */
   return(0);
 }
 
@@ -155,14 +129,14 @@ int pedhap::minRecombinant(string parent) {
   int prevhet=-1;
 
   /*
-  for(set<string>::iterator it1=kids.begin();it1!=kids.end();it1++) {
+    for(set<string>::iterator it1=kids.begin();it1!=kids.end();it1++) {
     unsigned char **c = haps->getHap(*it1);
     duo->setHaps(p,c,ped->sampleinfo[parent].sex);  
-    duo->EM(10);
+    duo->EM(NITERATION);
     duo->viterbi();
     pair<string,string> key(parent,*it1);
     stateseq[key] = duo->stateseq;
-  }
+    }
   */
 
   for(int l=0;l<nsnp;l++) {
@@ -199,9 +173,9 @@ int pedhap::correct() {
       if(dad.compare("0")!=0 || mum.compare("0")!=0)  
 	phase(*it2);
       /*
-      if(dad.compare("0")!=0)  
+	if(dad.compare("0")!=0)  
 	phase(dad,*it2);
-      if(mum.compare("0")!=0)  
+	if(mum.compare("0")!=0)  
 	phase(mum,*it2);
       */
     }
@@ -218,7 +192,7 @@ int pedhap::correct() {
 int pedhap::genotypingError(string outfile) {
   ofstream outf(outfile.c_str());
   cout << "Writing probable genotype errors to "<<outfile<<endl;
-
+  outf << "ID FID MID RSID1 RSID2 POS PROB_ERROR\n";
   for(vector< set<string> >::iterator it1=ped->pedigrees.begin(); it1!=ped->pedigrees.end(); it1++) {
 
     vector<string> idorder;
@@ -227,46 +201,48 @@ int pedhap::genotypingError(string outfile) {
     for(vector<string>::iterator it2=idorder.begin();it2!=idorder.end();it2++) {
       string dad = ped->sampleinfo[*it2].dad;
       string mum = ped->sampleinfo[*it2].mum;
+      cout << "Detecting errors for: " << *it2 << " - "<< dad << " - " << mum  << endl;
+
       if(dad.compare("0")!=0 && mum.compare("0")!=0) {
-	cout << dad << " - " << mum << " - " << *it2 << endl;
+
 	unsigned char **c = haps->getHap(*it2);
 	unsigned char **d = haps->getHap(dad);
 	unsigned char **m = haps->getHap(mum);
 	trio->setHaps(d,m,c);
-	trio->EM(10);
+	trio->EM(NITERATION);
 	for(int l=0;l<nsnp;l++) {
 	  double p = trio->genError[l];
 	  if(p>0.1) {
-	    outf << *it2 << " " << dad << " " << mum << " " << p;
+	    outf << *it2 << " " << dad << " " << mum;
 	    outf << " " << haps->rsid2[l]<< " " << haps->positions[l];
 	    outf << " " << trio->genError[l] << endl;
 	  }
 	}
 
       } else if(dad.compare("0")!=0) {
-	cout << dad << " - " << *it2 << endl;
+
 	unsigned char **c = haps->getHap(*it2);
 	unsigned char **d = haps->getHap(dad);
 	duo->setHaps(d,c,"1");
-	duo->EM(10);
+	duo->EM(NITERATION);
 	for(int l=0;l<nsnp;l++) {
 	  double p = trio->genError[l];
 	  if(p>0.1) {
-	    outf << *it2 << " " << dad << " " << mum << " " << p;
+	    outf << *it2 << " " << dad << " " << mum;
 	    outf << " " << haps->rsid2[l]<< " " << haps->positions[l];
 	    outf << " " << trio->genError[l] << endl;
 	  }
 	}
       } else if(mum.compare("0")!=0) {
-	cout << mum << " - " << *it2 << endl;
+
 	unsigned char **c = haps->getHap(*it2);
 	unsigned char **m = haps->getHap(mum);
 	duo->setHaps(m,c,"1");
-	duo->EM(10);
+	duo->EM(NITERATION);
 	for(int l=0;l<nsnp;l++) {
 	  double p = trio->genError[l];
 	  if(p>0.1) {
-	    outf << *it2 << " " << dad << " " << mum << " " << p;
+	    outf << *it2 << " " << dad << " " << mum;
 	    outf << " " << haps->rsid2[l]<< " " << haps->positions[l];
 	    outf << " " << trio->genError[l] << endl;
 	  }
@@ -280,6 +256,11 @@ int pedhap::genotypingError(string outfile) {
 
 int pedhap::recombinationMap(string outfile) { 
   ofstream outf(outfile.c_str());
+
+  outf << "PARENT CHILD";
+  for(int l=0;l<nsnp;l++) outf << " " << haps->positions[l];
+  outf << endl;
+
   cout << "Calculating recombination map and writing to "<<outfile<<endl;
   for(vector< set<string> >::iterator it1=ped->pedigrees.begin(); it1!=ped->pedigrees.end(); it1++) {
 
@@ -287,42 +268,46 @@ int pedhap::recombinationMap(string outfile) {
     ped->orderSamples(*it1,idorder);
 
     for(vector<string>::iterator it2=idorder.begin();it2!=idorder.end();it2++) {
-      string dad = ped->sampleinfo[*it2].dad;
-      string mum = ped->sampleinfo[*it2].mum;
-      if(dad.compare("0")!=0 && mum.compare("0")!=0) {
-	cout << dad << " - " << mum << " - " << *it2 << endl;
-	unsigned char **c = haps->getHap(*it2);
-	unsigned char **d = haps->getHap(dad);
-	unsigned char **m = haps->getHap(mum);
-	trio->setHaps(d,m,c);
-	trio->estimateRecombination();
-	outf << *it2 << " " << dad << "\t";
-	for(int l=0;l<nsnp;l++) outf << trio->recombinationPat[l] << " ";
-	outf << endl << *it2 << " " << mum << "\t";
-	for(int l=0;l<nsnp;l++) outf << trio->recombinationMat[l] << " ";
-	outf << endl;
+	string dad = ped->sampleinfo[*it2].dad;
+	string mum = ped->sampleinfo[*it2].mum;
 
-      } else if(dad.compare("0")!=0) {
-	cout << dad << " - " << *it2 << endl;
-	unsigned char **c = haps->getHap(*it2);
-	unsigned char **d = haps->getHap(dad);
-	duo->setHaps(d,c,"1");
-	duo->estimateRecombination();
-	outf << *it2 << " " << dad<<"\t";
-	for(int l=0;l<nsnp;l++) outf << duo->recombinationMap[l] << " ";
-	outf << endl;
-      } else if(mum.compare("0")!=0) {
-	cout << mum << " - " << *it2 << endl;
-	unsigned char **c = haps->getHap(*it2);
-	unsigned char **m = haps->getHap(mum);
-	duo->setHaps(m,c,"1");
-	duo->estimateRecombination();
-	outf << *it2 << " " << mum<<"\t";
-	for(int l=0;l<nsnp;l++) outf << duo->recombinationMap[l] << " ";
-	outf << endl;
+      if(dad.compare("0")!=0 || mum.compare("0")!=0) {
+
+	cout << "Mapping recombination for: " << *it2 << " - "<< dad << " - " << mum << endl;
+	if(dad.compare("0")!=0 && mum.compare("0")!=0) {
+
+	  unsigned char **c = haps->getHap(*it2);
+	  unsigned char **d = haps->getHap(dad);
+	  unsigned char **m = haps->getHap(mum);
+	  trio->setHaps(d,m,c);
+	  trio->estimateRecombination();
+	  outf << *it2 << " " << dad << "\t";
+	  for(int l=0;l<nsnp;l++) outf << trio->recombinationPat[l] << " ";
+	  outf << endl << *it2 << " " << mum << "\t";
+	  for(int l=0;l<nsnp;l++) outf << trio->recombinationMat[l] << " ";
+	  outf << endl;
+
+	} else if(dad.compare("0")!=0) {
+
+	  unsigned char **c = haps->getHap(*it2);
+	  unsigned char **d = haps->getHap(dad);
+	  duo->setHaps(d,c,"1");
+	  duo->estimateRecombination();
+	  outf << *it2 << " " << dad<<"\t";
+	  for(int l=0;l<nsnp;l++) outf << duo->recombinationMap[l] << " ";
+	  outf << endl;
+	} else if(mum.compare("0")!=0) {
+	  unsigned char **c = haps->getHap(*it2);
+	  unsigned char **m = haps->getHap(mum);
+	  duo->setHaps(m,c,"2");
+	  duo->estimateRecombination();
+	  outf << *it2 << " " << mum<<"\t";
+	  for(int l=0;l<nsnp;l++) outf << duo->recombinationMap[l] << " ";
+	  outf << endl;
+	}
       }
     }
-  }
-  
+  }  
   return 0;
 }
+

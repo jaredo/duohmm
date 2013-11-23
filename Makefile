@@ -4,10 +4,10 @@ BOOSTFLAGS = -lboost_iostreams -lboost_random -lboost_program_options
 CFLAGS = -O3  -Wall $(BOOSTFLAGS)
 #CFLAGS = -g -Wall  $(BOOSTFLAGS)
 
-test: pedhap.o hapmodule.o utilityfunc.o pedigree.o hmm_duo.o hmm_trio.o src/test.cpp
-	$(CC)  src/test.cpp pedhap.o hapmodule.o utilityfunc.o pedigree.o hmm_duo.o hmm_trio.o -o test $(CFLAGS)
 duohmm: pedhap.o hapmodule.o utilityfunc.o pedigree.o hmm_duo.o hmm_trio.o  src/duohmm.cpp 
 	$(CC)  src/duohmm.cpp pedhap.o hapmodule.o utilityfunc.o pedigree.o hmm_duo.o hmm_trio.o -o duohmm $(CFLAGS)
+test: pedhap.o hapmodule.o utilityfunc.o pedigree.o hmm_duo.o hmm_trio.o src/test.cpp
+	$(CC)  src/test.cpp pedhap.o hapmodule.o utilityfunc.o pedigree.o hmm_duo.o hmm_trio.o -o test $(CFLAGS)
 pedhap.o: src/pedhap.h src/pedhap.cpp utilityfunc.o pedigree.o hmm_duo.o hmm_trio.o
 	$(CC) -c src/pedhap.cpp $(CFLAGS) 
 hapmodule.o: src/hapmodule.cpp src/hapmodule.h utilityfunc.o

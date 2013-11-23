@@ -2,6 +2,10 @@
 #include "hapmodule.h"
 #include "utilityfunc.h"
 
+#define NITERATION 100
+#define DEBUG 0
+
+
 class geneticMap{
  public:
   geneticMap(string fname);

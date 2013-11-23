@@ -1,7 +1,5 @@
 #include "hmm.h"
 
-#define DEBUG 0
-
 geneticMap::geneticMap(string fname){
   if(fname.compare("")==0) {
     pos.push_back(0);
@@ -238,14 +236,29 @@ int DuoHMM::setHaps(unsigned char **parental_haplotypes,unsigned char **child_ha
 
 int DuoHMM::EM(int niteration) {
 
-  for(int i=0;i<niteration;i++) {
+
+  double switch1_old=switch1;
+  double switch2_old=switch2;
+  double error_old=error;
+  double tol=0.00001;
+  double dif=2*tol;
+  int i=0;
+  while(i<niteration && dif>tol) {
     if(DEBUG>1) {
+      cout << "ITERATION " <<i<<endl;
       cout << "error = "<< error << endl;
       cout << "switch1 = "<< switch1 << endl;
       cout << "switch2 = "<< switch2 << endl;
     }
+
     estep();
     mstep();
+
+    dif = abs(switch1_old-switch1)+abs( switch2_old-switch2)+abs(error_old-error);
+    switch1_old=switch1;
+    switch2_old=switch2;
+    error_old=error;
+    i++;
   }
 
   return(0);
@@ -301,14 +314,16 @@ int DuoHMM::mstep() {
     cout << "nswitch2 = " << nswitch2<<endl;
     cout << "ngenerror = " << ngenerror<<endl;
   }
-
+  /*
   switch1 =  (nswitch1 - genetic_length) / (nhet1 - 2*genetic_length);
   if(switch1<0.0) switch1 = 0.0;
   switch2 = nswitch2 / nhet2;
-
-  switch1 = nswitch1 / nhet1;
-  switch2 = nswitch2 / nhet2;
   error = ngenerror / nhet3;
+  */
+  switch1 =  (nswitch1 - genetic_length) / (nsnp - 2*genetic_length);
+  if(switch1<0.0) switch1 = 0.0;
+  switch2 = nswitch2 / nsnp;
+  error = ngenerror / nsnp;
 
   return(0);
 }
@@ -330,38 +345,58 @@ int DuoHMM::estep() {
 
   double aij;
   for(int l=0;l<nsnp-1;l++) {
+    assert(rho[l]>=0.0 && rho[l]<1.);
     denominator = 0.0;
+
     for(int i2=0;i2<2;i2++) {
       for(int j2=0;j2<2;j2++) {
 	int idx2 = i2*2+j2;
+
 	for(int i1=0;i1<2;i1++) {//transition probs
 	  for(int j1=0;j1<2;j1++) {
 	    int idx1 = i1*2+j1;
 	    trans_posterior[idx1][idx2][l] = alpha[idx1][l]*beta[idx2][l+1];
 
 	    if(i1==i2) 
-	      aij = ( (1-rho[l])*(1-switch1) + rho[l]*switch1 ); 
+	      aij =  (1-rho[l])*(1-switch1) + rho[l]*switch1 ; 
 	    else 
 	      aij = rho[l]*(1-switch1) + (1. - rho[l])*switch1 ; 
 
 	    if(j1==j2) 
 	      aij *= (1. - switch2);
 	    else 
-	      aij *= switch2;			 
+	      aij *= switch2;
+
 	    trans_posterior[idx1][idx2][l] *= aij;
+
 	    //emission
 	    if(child[j2][l+1]==parent[i2][l+1])  
-	      trans_posterior[idx1][idx2][l+1] *= noerror;
+	      trans_posterior[idx1][idx2][l] *= noerror;
 	    else 
-	      trans_posterior[idx1][idx2][l+1] *= error;
+	      trans_posterior[idx1][idx2][l] *= error;
+
 	    denominator +=  trans_posterior[idx1][idx2][l];
+	  }
+	}
+
+      }
+    }
+
+    for(int i2=0;i2<2;i2++) {
+      for(int j2=0;j2<2;j2++) {
+	int idx2 = i2*2+j2;
+	for(int i1=0;i1<2;i1++) {//transition probs
+	  for(int j1=0;j1<2;j1++) {
+	    int idx1 = i1*2+j1;
+	    //	    double tmp = trans_posterior[idx1][idx2][l];
+	    trans_posterior[idx1][idx2][l] /= denominator;
+	    //	    if(trans_posterior[idx1][idx2][l] > 0.5 && i1!=i2) 
+	    //	      cout << l << "\t" << idx1 << "\t" << idx2 << "\t" << tmp << "\t" << denominator << endl;	    
 	  }
 	}
       }
     }
-    for(int i=0;i<K;i++)
-      for(int j=0;j<K;j++)
-	trans_posterior[i][j][l] /= denominator;
+
   }
 
   return(0);
@@ -432,67 +467,85 @@ int DuoHMM::viterbi() {
   for(l=nsnp-2;l>=0;l--) 
     stateseq[l] = backtrack[stateseq[l+1]][l+1];
 
+  if(DEBUG>1) {
+    for(int l=0;l<nsnp;l++) 
+      cout << l <<  "\t" << (int)stateseq[l] << endl;
+  }
   return(0);
 }
 
 int DuoHMM::estimateRecombination() {
-  recombinationMap.resize(nsnp);
-  EM(10);
+
+  recombinationMap.assign(nsnp,0.0);
+  EM(NITERATION);
   double noerror = 1. - error;
   double r,rho2;
   int prevhet=-1;
   int l=0;
   while(parent[0][l]==parent[1][l]) l++;
   prevhet=l;
-  int start = l+1;
-  for(int i=0;i<l;i++) recombinationMap[i] = 0.0;
+
+
   vector <double> p;
 
   while(l<nsnp) {
+
     double recp=0;
-    double denominator,p1,p2;
+    double denominator=0,p1,p2;
     while(parent[0][l]==parent[1][l] && l<nsnp) l++;
-    r = multi * (cM[l]-cM[prevhet])/100.;    
-    rho2 = 1 - exp(-r);
-    for(int i2=0;i2<2;i2++) {
-      for(int j2=0;j2<2;j2++) {
-	int idx2 = i2*2+j2;
-	for(int i1=0;i1<2;i1++) {//transition probs
-	  for(int j1=0;j1<2;j1++) {
-	    int idx1 = i1*2+j1;
-	    if(child[j2][l]==parent[i2][l])  
-	      p1 = noerror*alpha[idx1][prevhet]*beta[idx2][l];
-	    else
-	      p1 = error*alpha[idx1][prevhet]*beta[idx2][l];
-	    p2 = p1;
 
-	    if(i1==i2) {
-	      p1 *= rho2*switch1; 
-	      p2 *= ( (1-rho2)*(1-switch1) + rho2*switch1 ); 
-	    }
-	    else {
-	      p1 *= rho2*(1-switch1);
-	      p2 *= rho2*(1-switch1) + (1. - rho2)*switch1 ; 
-	    }
+    if(l<nsnp) {
+      r = multi * (cM[l]-cM[prevhet])/100.;    
+      rho2 = 1 - exp(-r);
 
-	    if(j1==j2)  {
-	      p1 *= (1. - switch2);
-	      p2 *= (1. - switch2);
+      for(int i2=0;i2<2;i2++) {
+	for(int j2=0;j2<2;j2++) {
+
+	  int idx2 = i2*2+j2;
+
+	  for(int i1=0;i1<2;i1++) {//transition probs
+	    for(int j1=0;j1<2;j1++) {
+
+	      int idx1 = i1*2+j1;
+	      if(child[j2][l]==parent[i2][l])  
+		p1 = noerror*alpha[idx1][prevhet]*beta[idx2][l];
+	      else
+		p1 = error*alpha[idx1][prevhet]*beta[idx2][l];
+	      p2 = p1;
+	      
+	      if(i1==i2) {
+		p1 *= rho2*switch1; 
+		p2 *= ( (1-rho2)*(1-switch1) + rho2*switch1 ); 
+	      }
+	      else {
+		p1 *= rho2*(1-switch1);
+		p2 *= ( rho2*(1-switch1) + (1. - rho2)*switch1 ); 
+	      }
+	      if(j1==j2)  {
+		p1 *= (1. - switch2);
+		p2 *= (1. - switch2);
+	      }
+	      else { 
+		p1 *= switch2;
+		p2 *= switch2;
+	      }
+	      recp += p1;
+	      denominator +=  p2;
 	    }
-	    else { 
-	      p1 *= switch2;
-	      p2 *= switch2;
-	    }
-	    recp += p1;
-	    denominator +=  p2;
 	  }
+
 	}
       }
+      recp/=denominator;
     }
-    recp/=denominator;
+    else {
+      recp = 0.0;
+    }
+    assert(recp>=0.0 && recp<=1.);
+
     for(int i=prevhet;i<l;i++) recombinationMap[i] = recp;
+    prevhet=l;
     l++;
   }
-
   return 0;
 }

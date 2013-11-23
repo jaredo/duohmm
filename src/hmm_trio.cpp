@@ -1,6 +1,5 @@
 #include "hmm.h"
 
-#define DEBUG 0
 
 TrioHMM::TrioHMM(vector<int> & positions, geneticMap & gm)
 {
@@ -228,7 +227,15 @@ int TrioHMM::backward() {
 
 int TrioHMM::EM(int niteration) {
 
-  for(int i=0;i<niteration;i++) {
+  double switch_dad_old=switch_dad;
+  double switch_mum_old=switch_mum;
+  double switch_child_old=switch_child;
+  double error_old=error;
+  double tol=0.00001;
+  double dif=2*tol;
+  int i=0;
+
+  while(i<niteration && dif>tol) {
     if(DEBUG>1) {
       cout.precision(10);
       cout << "\nITERATION "<<i<<endl;
@@ -237,8 +244,16 @@ int TrioHMM::EM(int niteration) {
       cout << "switch_mum = "<< switch_mum << endl;
       cout << "switch_child = "<< switch_child << endl;
     }
+
     estep();
     mstep();
+
+    dif = abs(switch_dad_old-switch_dad)+abs( switch_mum_old-switch_mum)+abs(switch_child_old-switch_child)+abs(error_old-error);
+    switch_dad_old=switch_dad;
+    switch_mum_old=switch_mum;
+    switch_child_old=switch_child;
+    error_old=error;
+    i++;
   }
 
   return(0);
@@ -287,7 +302,9 @@ int TrioHMM::mstep() {
 	}
       }
     }
+  }
 
+  for(int l=0;l<nsnp-1;l++) {
     //switch error counts
     for(int i2=0;i2<2;i2++) {
       for(int j2=0;j2<2;j2++) {
@@ -322,17 +339,18 @@ int TrioHMM::mstep() {
     cout << male_length << " " << female_length << endl << endl;
   }
 
+  nhet_dad=nsnp;
+  nhet_child=nsnp;
+  nhet_mum=nsnp;
+
   switch_dad =  (nswitch_dad - male_length) / (nhet_dad - 2*male_length);
   switch_mum =  (nswitch_mum - female_length) / (nhet_mum - 2*female_length);
-  /*
-  switch_dad =  nswitch_dad/nhet_dad;
-  switch_mum =  nswitch_mum/nhet_mum;
-  */
   if(switch_dad<0.0) switch_dad = 0.0;
   if(switch_mum<0.0) switch_mum = 0.0;
 
   switch_child = nswitch_child / nhet_child;
   error = ngenerror / nhet_inf;
+
   if(error<=0.0) error = 0.00001;
 
   return(0);
@@ -356,7 +374,7 @@ int TrioHMM::estep() {
 
   int kdad,kmum;
   double aij;
-  for(int l=1;l<nsnp-1;l++) {
+  for(int l=0;l<nsnp-1;l++) {
     denominator = 0.0;
     for(int i2=0;i2<2;i2++) {
       for(int j2=0;j2<2;j2++) {
@@ -522,7 +540,7 @@ int TrioHMM::viterbi() {
 int TrioHMM::estimateRecombination() {
   recombinationPat.assign(nsnp,0.0);
   recombinationMat.assign(nsnp,0.0);
-  EM(10);
+  EM(NITERATION);
   double r,rho_mum,rho_dad;
   double noerror = 1. - error;
   int prevhet=-1;
@@ -531,7 +549,7 @@ int TrioHMM::estimateRecombination() {
   int kdad,kmum;
   while(dad[0][l]==dad[1][l]) l++;
   prevhet=l;
-  for(int i=0;i<l;i++) recombinationPat[i] = 0.0;
+
   while(l<nsnp) {
     l++;
     while(dad[0][l]==dad[1][l] && l<nsnp) l++;
@@ -542,7 +560,7 @@ int TrioHMM::estimateRecombination() {
       //      rho_dad = 0.5;
       rho_mum = 1 - exp(-female_multiplier*r);
       recp = 0.0;
-      double denominator=0,aij;//recombination probability
+      double denominator=0;//recombination probability
 
       for(int i2=0;i2<2;i2++) {
 	for(int j2=0;j2<2;j2++) {
@@ -587,17 +605,19 @@ int TrioHMM::estimateRecombination() {
 	  }
 	}
       }
+      recp/=denominator;
     }
     else {
       recp = 0.0;
     }
+    assert(recp>=0.0 && recp<=1.0);
     for(int i=prevhet;i<l;i++) recombinationPat[i] = recp;
     prevhet = l;
   }
   l=0;
   while(mum[0][l]==mum[1][l]) l++;
   prevhet=l;
-  for(int i=0;i<l;i++) recombinationPat[i] = 0.0;
+  
   while(l<nsnp) {
     l++;
     while(mum[0][l]==mum[1][l] && l<nsnp) l++;
@@ -652,10 +672,12 @@ int TrioHMM::estimateRecombination() {
 	  }
 	}
       }
+      recp/=denominator;    
     }
     else {
       recp = 0.0;
     }
+    assert(recp>=0.0 && recp<=1.0);
     for(int i=prevhet;i<l;i++) recombinationMat[i] = recp;
     prevhet = l;
   }
