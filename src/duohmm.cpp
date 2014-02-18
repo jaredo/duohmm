@@ -16,7 +16,7 @@
 #include <boost/program_options.hpp>
 namespace po = boost::program_options;
 
-#define version "0.1.0"
+#define version "0.1.1"
 using namespace std;
 
 int main(int argc,char **argv) {
@@ -25,9 +25,9 @@ int main(int argc,char **argv) {
 
     po::options_description desc("Allowed options");
     desc.add_options()
-      ("help", "produce help message")
+      //      ("help", "produce help message")
       ("haps,H", po::value<string>(&haps), "SHAPEIT2 haplotype file")
-      ("fam,F", po::value<string>(&fam), "pedigree information in PLINK .fam format")
+      //      ("fam,F", po::value<string>(&fam), "pedigree information in PLINK .fam format")
       ("input-gen,M", po::value<string>(&gm)->default_value(""),"genetic map file in SHAPEIT2/Impute format")
       ("output-hap,O", po::value<string>(&corrected_out), "output pedigree corrected haplotypes this file")
       ("output-generr,G", po::value<string>(&generr_out), "output possible genotyping errors to this file")
@@ -38,7 +38,7 @@ int main(int argc,char **argv) {
     po::notify(vm);    
 
     cout << endl;
-    cout << "DuoHMM: a post-hoc method for integrating extended pedigree information with SHAPEIT2 haplotypes" << endl;
+    cout << "DuoHMM: a post-hoc method for integrating extended pedigree information with SHAPEIT2 haplotypes\n" << endl;
     cout << "\t* Authors: Jared O'Connell, Olivier Delaneau and Jonathan Marchini" << endl;
     cout << "\t* Webpage: http:://www.shapeit.fr/duohmm" << endl;
     cout << "\t* Version: " << version << endl;
@@ -56,7 +56,7 @@ int main(int argc,char **argv) {
       cout << "No haplotypes file provided.\nExiting..." << endl;
       return(1);
     }
-
+    /*
     if (vm.count("fam")) {
       if(!fileexists(fam)) {
 	cerr << fam << " does not exist!\nExiting...."<<endl;
@@ -68,7 +68,7 @@ int main(int argc,char **argv) {
       cout << "No pedigree information provided.\nExiting..." << endl;
       return(1);
     }
-
+    */
     if( !(vm.count("output-hap") || vm.count("output-generr") || vm.count("output-rec")))  {
       cout << "You must specify one of: --output-hap --output-generr --output-rec\nExiting..."<<endl;
       return 1;
@@ -99,7 +99,8 @@ int main(int argc,char **argv) {
     if(gm.compare("")==0) 
       cout <<"WARNING: You have not specified a genetic map! This is not recommended.\nRecombination rate will be set to 1.19 cM/Mb. (sex averaged)"<<endl;
 
-    pedhap ph(haps,fam,gm);    
+    //    pedhap ph(haps,fam,gm);    
+    pedhap ph(haps,gm);    
     cout << "Correcting haplotypes based on pedigree structure..."<<endl;
     ph.correct();
 

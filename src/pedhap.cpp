@@ -19,7 +19,7 @@ int unswitch(unsigned char **h,int start,int stop) {
 //constructor
 pedhap::pedhap(string hap_filename,string pedigree_filename,string gm_filename) {
   haps =  new Haplotypes(hap_filename);
-  ped = new pedigree(pedigree_filename,haps->ids);
+  ped = new pedigree(pedigree_filename,haps->ids,'f');
   gm = new geneticMap(gm_filename);
   duo =  new DuoHMM(haps->positions,*gm);
   trio =  new TrioHMM(haps->positions,*gm);
@@ -27,6 +27,16 @@ pedhap::pedhap(string hap_filename,string pedigree_filename,string gm_filename) 
 }
 
 //constructor
+pedhap::pedhap(string hap_filename,string gm_filename) {
+  haps =  new Haplotypes(hap_filename);
+  ped = new pedigree(hap_filename+".sample",haps->ids,'s');
+  gm = new geneticMap(gm_filename);
+  duo =  new DuoHMM(haps->positions,*gm);
+  trio =  new TrioHMM(haps->positions,*gm);
+  nsnp = haps->positions.size();
+}
+
+/*
 pedhap::pedhap(string hap_filename,string pedigree_filename) {
   haps =  new Haplotypes(hap_filename);
   ped = new pedigree(pedigree_filename,haps->ids);
@@ -35,16 +45,17 @@ pedhap::pedhap(string hap_filename,string pedigree_filename) {
   trio =  new TrioHMM(haps->positions,*gm);
   nsnp = haps->positions.size();
 }
+*/
 
 int pedhap::phase(string child) {
   if(DEBUG>0)  cout << child << endl;
   assert(ped->sampleinfo.count(child));
   string dad = ped->sampleinfo[child].dad;
   string mum = ped->sampleinfo[child].mum;
+  cout << "Phasing " << child << " - " << dad << " - " << mum << endl;
   assert(ped->sampleinfo.count(dad)  ||  ped->sampleinfo.count(mum));
   unsigned char **d,**m,**p;
   unsigned char **c = haps->getHap(child);
-  cout << "Phasing " << child << " - " << dad << " - " << mum << endl;
   pair<string,string> key,key1,key2;
   if(dad.compare("0")!=0 && mum.compare("0")!=0) {
     d = haps->getHap(dad);
@@ -192,7 +203,7 @@ int pedhap::correct() {
 int pedhap::genotypingError(string outfile) {
   ofstream outf(outfile.c_str());
   cout << "Writing probable genotype errors to "<<outfile<<endl;
-  outf << "ID FID MID RSID1 RSID2 POS PROB_ERROR\n";
+  outf << "ID\tfather\tmother\tRSID1\tPOS\tPROB_ERROR\n";
   for(vector< set<string> >::iterator it1=ped->pedigrees.begin(); it1!=ped->pedigrees.end(); it1++) {
 
     vector<string> idorder;
@@ -213,9 +224,9 @@ int pedhap::genotypingError(string outfile) {
 	for(int l=0;l<nsnp;l++) {
 	  double p = trio->genError[l];
 	  if(p>0.1) {
-	    outf << *it2 << " " << dad << " " << mum;
-	    outf << " " << haps->rsid2[l]<< " " << haps->positions[l];
-	    outf << " " << trio->genError[l] << endl;
+	    outf << *it2 << "\t" << dad << "\t" << mum;
+	    outf << "\t"<< haps->rsid1[l]<< "\t"  << haps->positions[l];
+	    outf << "\t" << trio->genError[l] << endl;
 	  }
 	}
 
@@ -226,25 +237,25 @@ int pedhap::genotypingError(string outfile) {
 	duo->setHaps(d,c,"1");
 	duo->EM(NITERATION);
 	for(int l=0;l<nsnp;l++) {
-	  double p = trio->genError[l];
+	  double p = duo->genError[l];
 	  if(p>0.1) {
-	    outf << *it2 << " " << dad << " " << mum;
-	    outf << " " << haps->rsid2[l]<< " " << haps->positions[l];
-	    outf << " " << trio->genError[l] << endl;
+	    outf << *it2 << "\t" << dad << "\t" << mum;
+	    outf << "\t"<< haps->rsid1[l]<< "\t" << haps->positions[l];
+	    outf << "\t" << duo->genError[l] << endl;
 	  }
 	}
       } else if(mum.compare("0")!=0) {
 
 	unsigned char **c = haps->getHap(*it2);
 	unsigned char **m = haps->getHap(mum);
-	duo->setHaps(m,c,"1");
+	duo->setHaps(m,c,"2");
 	duo->EM(NITERATION);
 	for(int l=0;l<nsnp;l++) {
-	  double p = trio->genError[l];
+	  double p = duo->genError[l];
 	  if(p>0.1) {
-	    outf << *it2 << " " << dad << " " << mum;
-	    outf << " " << haps->rsid2[l]<< " " << haps->positions[l];
-	    outf << " " << trio->genError[l] << endl;
+	    outf << *it2 << "\t" << dad << "\t" << mum;
+	    outf << "\t" << haps->rsid1[l]<< "\t" << haps->positions[l];
+	    outf << "\t" << duo->genError[l] << endl;
 	  }
 	}
       }
@@ -275,7 +286,6 @@ int pedhap::recombinationMap(string outfile) {
 
 	cout << "Mapping recombination for: " << *it2 << " - "<< dad << " - " << mum << endl;
 	if(dad.compare("0")!=0 && mum.compare("0")!=0) {
-
 	  unsigned char **c = haps->getHap(*it2);
 	  unsigned char **d = haps->getHap(dad);
 	  unsigned char **m = haps->getHap(mum);
@@ -305,6 +315,7 @@ int pedhap::recombinationMap(string outfile) {
 	  for(int l=0;l<nsnp;l++) outf << duo->recombinationMap[l] << " ";
 	  outf << endl;
 	}
+
       }
     }
   }  

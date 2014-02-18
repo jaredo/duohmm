@@ -10,6 +10,10 @@ geneticMap::geneticMap(string fname){
   } else {
     io::filtering_istream inf2;
     ifstream blah(fname.c_str(),ios_base::in);
+    if(!blah) {
+      cerr << "Problem reading genetic map: " << fname << "\nExiting..."<<endl;
+      exit(1);
+    }
     inf2.push(blah);
     int tmp1;
     double tmp2,tmp3;
@@ -314,12 +318,17 @@ int DuoHMM::mstep() {
     cout << "nswitch2 = " << nswitch2<<endl;
     cout << "ngenerror = " << ngenerror<<endl;
   }
+
+  //since these events are only detectable at hetorzygote sites, mstep denominator should probably be nhets rather than nsnp
+  //in practice makes little difference
+
   /*
-  switch1 =  (nswitch1 - genetic_length) / (nhet1 - 2*genetic_length);
-  if(switch1<0.0) switch1 = 0.0;
-  switch2 = nswitch2 / nhet2;
-  error = ngenerror / nhet3;
+    switch1 =  (nswitch1 - genetic_length) / (nhet1 - 2*genetic_length);
+    if(switch1<0.0) switch1 = 0.0;
+    switch2 = nswitch2 / nhet2;
+    error = ngenerror / nhet3;
   */
+
   switch1 =  (nswitch1 - genetic_length) / (nsnp - 2*genetic_length);
   if(switch1<0.0) switch1 = 0.0;
   switch2 = nswitch2 / nsnp;

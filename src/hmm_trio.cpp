@@ -342,14 +342,24 @@ int TrioHMM::mstep() {
   nhet_dad=nsnp;
   nhet_child=nsnp;
   nhet_mum=nsnp;
-
+  //since these events are only detectable at hetorzygote sites, mstep denominator should probably be nhets rather than nsnp
+  //in practice makes little difference
+  /*
   switch_dad =  (nswitch_dad - male_length) / (nhet_dad - 2*male_length);
   switch_mum =  (nswitch_mum - female_length) / (nhet_mum - 2*female_length);
   if(switch_dad<0.0) switch_dad = 0.0;
   if(switch_mum<0.0) switch_mum = 0.0;
-
   switch_child = nswitch_child / nhet_child;
   error = ngenerror / nhet_inf;
+  */
+
+  switch_dad =  (nswitch_dad - male_length) / (nsnp - 2*male_length);
+  switch_mum =  (nswitch_mum - female_length) / (nsnp - 2*female_length);
+  if(switch_dad<0.0) switch_dad = 0.0;
+  if(switch_mum<0.0) switch_mum = 0.0;
+  switch_child = nswitch_child / nsnp;
+  error = ngenerror / nsnp;
+
 
   if(error<=0.0) error = 0.00001;
 
