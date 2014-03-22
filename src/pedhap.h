@@ -7,7 +7,9 @@
 class pedhap {
  public:
   pedhap(string hap_filename,string pedigree_filename,string gm_filename);
-  pedhap(string hap_filename,string pedigree_filename);
+  pedhap(string hap_filename,string gm_filename);
+  //  pedhap(string hap_filename,string pedigree_filename);
+
 
   int phase(string child);
   int correct();
