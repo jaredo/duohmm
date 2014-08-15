@@ -1,7 +1,7 @@
 //============================================================================
 // Name        : duohmm.cpp
 // Author      : Jared O'Connell
-// Copyright   : 
+// Copyright   : Jared O'Connell (2014) 
 // Description : post-hoc pedigree integration for shapeit2 haplotypes.
 //============================================================================
 
@@ -16,7 +16,7 @@
 #include <boost/program_options.hpp>
 namespace po = boost::program_options;
 
-#define version "0.1.1"
+#define version "0.1.3"
 using namespace std;
 
 int main(int argc,char **argv) {
@@ -40,9 +40,9 @@ int main(int argc,char **argv) {
     cout << endl;
     cout << "DuoHMM: a post-hoc method for integrating extended pedigree information with SHAPEIT2 haplotypes\n" << endl;
     cout << "\t* Authors: Jared O'Connell, Olivier Delaneau and Jonathan Marchini" << endl;
-    cout << "\t* Webpage: http:://www.shapeit.fr/duohmm" << endl;
+    cout << "\t* Webpage: http://www.stats.ox.ac.uk/~marchini/software/gwas/gwas.html" << endl;
     cout << "\t* Version: " << version << endl;
-    cout << "\t* Contact: jared.oconnell@gmail.com" << endl;
+    cout << "\t* Contact: jaredoconnell@gmail.com" << endl;
     cout << endl;
 
     if (vm.count("help") || argc==1) {

@@ -620,7 +620,13 @@ int TrioHMM::estimateRecombination() {
     else {
       recp = 0.0;
     }
-    assert(recp>=0.0 && recp<=1.0);
+    if(!(recp>=0.0 && recp<=1.0)){
+      cout << "ERROR:Invalid probability encountered"<<endl<<recp<<endl;
+      cout << l << endl;
+      cout <<  cM[l]<<" "<<cM[prevhet]<< endl;
+      cout << r << endl;
+      exit(1);
+    };
     for(int i=prevhet;i<l;i++) recombinationPat[i] = recp;
     prevhet = l;
   }

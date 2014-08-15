@@ -1,6 +1,5 @@
 #include "utilityfunc.h"
 
-boost::random::mt19937 gen;
 
 int argmax(vector<double> & x) {
   int maxind=0;
@@ -44,34 +43,6 @@ int which_max(int *x,int n) {
     }
   }
   return maxidx;
-}
-
-int getRandom(int n) {
-  boost::random::uniform_int_distribution<> randomthingy(0,n);
-  return(randomthingy(gen));
-}
-
-int randomInt(int a,int b) {
-  boost::random::uniform_int_distribution<> randomthingy(a,b-1);
-  return(randomthingy(gen));
-}
-
-// unordered_set<int> sampleIndex(int k,int n) {
-//   unordered_set<int> ret;
-//   int idx;
-
-//   for(int i=0;i<k;i++) {
-//     idx = randomInt(0,n);
-//     while(ret.count(idx))     idx = randomInt(0,n);
-//     ret.insert(idx);
-//   }
-
-//   return(ret);
-// }
-
-int rbinom(int n,float p) {
-  boost::random::binomial_distribution<> randomthingy(n,p);
-  return randomthingy(gen);
 }
 
 /******************************************************/

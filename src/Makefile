@@ -1,12 +1,16 @@
 CC = g++
-BOOSTFLAGS =  -lboost_iostreams  -lboost_random  -lboost_program_options -lz
-#BOOSTFLAGS = /homes/oconnell/BOOST/lib/libboost_iostreams.a /homes/oconnell/BOOST/lib/libboost_random.a /homes/oconnell/BOOST/lib/libboost_program_options.a
-#CFLAGS = -O3  $(BOOSTFLAGS)
-CFLAGS = -O3 -Wall -static
-#CFLAGS = -g -Wall  $(BOOSTFLAGS)
+BOOSTFLAGS =  -lboost_iostreams -lboost_program_options -lz
+#BOOSTFLAGS =  -Wl,-Bstatic ~/BOOST/lib/libboost_iostreams.a ~/BOOST/lib/libboost_program_options.a  -Wl,-Bdynamic -lz
+BOOSTFLAGS =   ~/BOOST/lib/libboost_iostreams.a ~/BOOST/lib/libboost_program_options.a -lz
+
+release: CFLAGS = -O3
+release: duohmm
+
+debug: CFLAGS = -g -Wall
+debug: duohmm 
 
 duohmm: pedhap.o hapmodule.o utilityfunc.o pedigree.o hmm_duo.o hmm_trio.o  duohmm.cpp 
-	$(CC) -static duohmm.cpp pedhap.o hapmodule.o utilityfunc.o pedigree.o hmm_duo.o hmm_trio.o -o duohmm $(CFLAGS)  $(BOOSTFLAGS)
+	$(CC) duohmm.cpp pedhap.o hapmodule.o utilityfunc.o pedigree.o hmm_duo.o hmm_trio.o -o duohmm $(CFLAGS)  $(BOOSTFLAGS)
 test: pedhap.o hapmodule.o utilityfunc.o pedigree.o hmm_duo.o hmm_trio.o test.cpp
 	$(CC)  test.cpp pedhap.o hapmodule.o utilityfunc.o pedigree.o hmm_duo.o hmm_trio.o -o test $(CFLAGS)
 pedhap.o: pedhap.h pedhap.cpp utilityfunc.o pedigree.o hmm_duo.o hmm_trio.o

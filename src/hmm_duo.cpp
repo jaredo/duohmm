@@ -29,6 +29,8 @@ geneticMap::geneticMap(string fname){
       cM.push_back(tmp3);
       nsnp++;
     }
+    pos.push_back(4000e6);     
+    cM.push_back(4000. * 1.19);
   }
 }
 
@@ -550,7 +552,16 @@ int DuoHMM::estimateRecombination() {
     else {
       recp = 0.0;
     }
-    assert(recp>=0.0 && recp<=1.);
+    if(!(recp>=0.0 && recp<=1.0)){
+      cout << "ERROR:Invalid probability encountered"<<endl<<recp<<endl;
+      cout << l << endl;
+      cout <<  cM[l]<<" "<<cM[prevhet]<< endl;
+      cout << r << endl;
+      cout << rho2 << endl;
+      cout << switch1 << endl;
+      cout << switch2 << endl;
+      exit(1);
+    };
 
     for(int i=prevhet;i<l;i++) recombinationMap[i] = recp;
     prevhet=l;

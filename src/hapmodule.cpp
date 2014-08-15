@@ -14,6 +14,11 @@ Haplotypes::Haplotypes(const Haplotypes& h) {
 Haplotypes::Haplotypes(string filename) {
   input_file = filename;
   ifstream inf1((filename+".sample").c_str());
+  if(!inf1) {
+    cerr << "Problem reading "<< filename+".sample" << endl;
+    exit(1);
+  }
+    
   string line;
   int pos;
   char c;
@@ -39,6 +44,11 @@ Haplotypes::Haplotypes(string filename) {
   io::filtering_istream inf2;
   //ifstream blah((filename+".haps").c_str(),ios_base::in | ios_base::binary);
   ifstream blah((filename+".haps").c_str(),ios_base::in);
+  if(!blah) {
+    cerr << "Problem reading "<< filename+".haps" << endl;
+    exit(1);
+  }
+
   //inf2.push(io::gzip_decompressor());
   inf2.push(blah);
   count = 0;
