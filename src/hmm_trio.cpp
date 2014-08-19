@@ -22,6 +22,8 @@ TrioHMM::TrioHMM(vector<int> & positions, geneticMap & gm)
 
   for(int i=0;i<nsnp-1;i++) {
     r = (cM[i+1]-cM[i])/100.;
+    if(r<=0.0) r = 1e-13;//hack to handle positions with same genetic location (which shouldnt be in the snps in the first place)
+
     male_norho[i] = exp(-r * male_multiplier);
     male_rho[i] = 1. - male_norho[i];
     female_norho[i] = exp(-r * female_multiplier);
@@ -566,6 +568,8 @@ int TrioHMM::estimateRecombination() {
     if(l<nsnp) {
 
       r =  (cM[l]-cM[prevhet])/100.;    
+      if(r<=0.0) r = 1e-13;//hack to handle positions with same genetic location (which shouldnt be in the snps in the first place)
+
       rho_dad = 1 - exp(-male_multiplier*r);
       //      rho_dad = 0.5;
       rho_mum = 1 - exp(-female_multiplier*r);
@@ -625,6 +629,10 @@ int TrioHMM::estimateRecombination() {
       cout << l << endl;
       cout <<  cM[l]<<" "<<cM[prevhet]<< endl;
       cout << r << endl;
+      cout << rho_dad << endl;
+      cout << switch_dad << endl;
+      cout << switch_mum << endl;
+
       exit(1);
     };
     for(int i=prevhet;i<l;i++) recombinationPat[i] = recp;
@@ -640,6 +648,7 @@ int TrioHMM::estimateRecombination() {
     if(l<nsnp) {
 
       r =  (cM[l]-cM[prevhet])/100.;    
+      if(r<=0.0) r = 1e-13;//hack to handle positions with same genetic location (which shouldnt be in the snps in the first place)
       rho_dad = 1 - exp(-male_multiplier*r);
       //      rho_dad = 0.5;
       rho_mum = 1 - exp(-female_multiplier*r);

@@ -29,8 +29,9 @@ geneticMap::geneticMap(string fname){
       cM.push_back(tmp3);
       nsnp++;
     }
-    pos.push_back(4000e6);     
-    cM.push_back(4000. * 1.19);
+    float     maxpos = 1e9;
+    pos.push_back(maxpos);
+    cM.push_back(maxpos * 1.19);
   }
 }
 
@@ -85,6 +86,7 @@ DuoHMM::DuoHMM(vector<int> & positions, geneticMap & gm)
 	cout << i << " " << positions[i] << " " << cM[i]<<endl;
 
     r = (cM[i+1]-cM[i])/100.;
+    if(r<=0.0) r = 1e-13;//hack to handle positions with same genetic location (which shouldnt be in the snps in the first place)
     male_norho[i] = exp(-r * male_multiplier);
     male_rho[i] = 1. - male_norho[i];
     female_norho[i] = exp(-r * female_multiplier);
@@ -496,7 +498,6 @@ int DuoHMM::estimateRecombination() {
   while(parent[0][l]==parent[1][l]) l++;
   prevhet=l;
 
-
   vector <double> p;
 
   while(l<nsnp) {
@@ -507,6 +508,7 @@ int DuoHMM::estimateRecombination() {
 
     if(l<nsnp) {
       r = multi * (cM[l]-cM[prevhet])/100.;    
+      if(r<=0.0) r = 1e-13;//hack to handle positions with same genetic location (which shouldnt be in the snps in the first place)
       rho2 = 1 - exp(-r);
 
       for(int i2=0;i2<2;i2++) {

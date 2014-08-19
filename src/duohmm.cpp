@@ -16,7 +16,7 @@
 #include <boost/program_options.hpp>
 namespace po = boost::program_options;
 
-#define version "0.1.3"
+#define version "0.1.4"
 using namespace std;
 
 int main(int argc,char **argv) {
