@@ -27,13 +27,16 @@ pedhap::pedhap(string hap_filename,string pedigree_filename,string gm_filename) 
 }
 
 //constructor
-pedhap::pedhap(string hap_filename,string gm_filename) {
+pedhap::pedhap(string hap_filename,string gm_filename,int niteration) {
   haps =  new Haplotypes(hap_filename);
   ped = new pedigree(hap_filename+".sample",haps->ids,'s');
   gm = new geneticMap(gm_filename);
   duo =  new DuoHMM(haps->positions,*gm);
+  duo->setIterations(niteration);
   trio =  new TrioHMM(haps->positions,*gm);
+  trio->setIterations(niteration);
   nsnp = haps->positions.size();
+  NITERATION=niteration;
 }
 
 /*
@@ -131,8 +134,10 @@ int pedhap::minRecombinant(string parent) {
   if(ped->sampleinfo[parent].kids.size()<minsib) 
     return(0);//not enough kids.
 
+  /*
   if(ped->sampleinfo[parent].mum.compare("0")!=0 || ped->sampleinfo[parent].dad.compare("0")!=0)
     return(0);//has grand-parents = already phased
+  */
 
   if(DEBUG>0)  cout << "Finding minimum recombinant solution for "<<parent<<endl;
   unsigned char **p = haps->getHap(parent);

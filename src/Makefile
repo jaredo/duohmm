@@ -1,16 +1,19 @@
-CC = g++
-BOOSTFLAGS =  -lboost_iostreams -lboost_program_options -lz
-#BOOSTFLAGS =  -Wl,-Bstatic ~/BOOST/lib/libboost_iostreams.a ~/BOOST/lib/libboost_program_options.a  -Wl,-Bdynamic -lz
-BOOSTFLAGS =   ~/BOOST/lib/libboost_iostreams.a ~/BOOST/lib/libboost_program_options.a -lz
+ifndef BOOST_ROOT
+    $(error BOOST_ROOT is undefined)
+endif
 
-release: CFLAGS = -O3
+CC = g++
+LFLAGS = -L$(BOOST_ROOT)/lib -lz -lboost_iostreams  -lboost_program_options
+IFLAGS = -O3  -I$(BOOST_ROOT)/include
+
+release: CFLAGS = -O3 $(IFLAGS)
 release: duohmm
 
-debug: CFLAGS = -g -Wall
+debug: CFLAGS = -g -Wall $(IFLAGS)
 debug: duohmm 
 
 duohmm: pedhap.o hapmodule.o utilityfunc.o pedigree.o hmm_duo.o hmm_trio.o  duohmm.cpp 
-	$(CC) duohmm.cpp pedhap.o hapmodule.o utilityfunc.o pedigree.o hmm_duo.o hmm_trio.o -o duohmm $(CFLAGS)  $(BOOSTFLAGS)
+	$(CC) duohmm.cpp pedhap.o hapmodule.o utilityfunc.o pedigree.o hmm_duo.o hmm_trio.o -o duohmm $(CFLAGS)  $(LFLAGS)
 test: pedhap.o hapmodule.o utilityfunc.o pedigree.o hmm_duo.o hmm_trio.o test.cpp
 	$(CC)  test.cpp pedhap.o hapmodule.o utilityfunc.o pedigree.o hmm_duo.o hmm_trio.o -o test $(CFLAGS)
 pedhap.o: pedhap.h pedhap.cpp utilityfunc.o pedigree.o hmm_duo.o hmm_trio.o
@@ -31,4 +34,3 @@ all: duohmm test
 clean:
 	rm *.o
 	rm duohmm test
-

@@ -1,9 +1,11 @@
 #include "hmm.h"
 
 
+
 TrioHMM::TrioHMM(vector<int> & positions, geneticMap & gm)
 {
   double r;
+  NITERATION=100;
   K=8;
   male_multiplier = 0.7539868;
   female_multiplier = 1.2460132; 
@@ -48,6 +50,10 @@ TrioHMM::TrioHMM(vector<int> & positions, geneticMap & gm)
     posterior[i].resize(nsnp);
   }
   stateseq.resize(nsnp);
+}
+
+void TrioHMM::setIterations(int n) {
+  NITERATION = n;
 }
 
 int TrioHMM::setHaps(unsigned char **dadptr,unsigned char **mumptr,unsigned char **childptr) { 

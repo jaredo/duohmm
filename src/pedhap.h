@@ -7,7 +7,7 @@
 class pedhap {
  public:
   pedhap(string hap_filename,string pedigree_filename,string gm_filename);
-  pedhap(string hap_filename,string gm_filename);
+  pedhap(string hap_filename,string gm_filename,int niteration=100);
   //  pedhap(string hap_filename,string pedigree_filename);
 
 
@@ -17,7 +17,7 @@ class pedhap {
   int genotypingError(string outfile);
   int recombinationMap(string outfile);
 
-  int nsnp;
+  int nsnp,NITERATION;
   map< pair<string,string>, vector<unsigned char> > stateseq;
 
   geneticMap *gm;

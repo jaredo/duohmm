@@ -63,8 +63,13 @@ int geneticMap::interpolate(vector<int> & positions,vector<double> & output){
   return(0);
 }
 
+void DuoHMM::setIterations(int n) {
+  NITERATION = n;
+}
+
 DuoHMM::DuoHMM(vector<int> & positions, geneticMap & gm)
 {
+  NITERATION=100;
   double r;
   male_multiplier = 0.7539868;
   female_multiplier = 1.2460132; 

@@ -16,13 +16,13 @@
 #include <boost/program_options.hpp>
 namespace po = boost::program_options;
 
-#define version "0.1.4"
+#define version "2014.08.20.0"
 using namespace std;
 
 int main(int argc,char **argv) {
   try {
     string haps,fam,gm,corrected_out,generr_out,rec_out;
-
+    int niteration;
     po::options_description desc("Allowed options");
     desc.add_options()
       //      ("help", "produce help message")
@@ -31,7 +31,8 @@ int main(int argc,char **argv) {
       ("input-gen,M", po::value<string>(&gm)->default_value(""),"genetic map file in SHAPEIT2/Impute format")
       ("output-hap,O", po::value<string>(&corrected_out), "output pedigree corrected haplotypes this file")
       ("output-generr,G", po::value<string>(&generr_out), "output possible genotyping errors to this file")
-      ("output-rec,R", po::value<string>(&rec_out), "output recombination map for pedigree to this file");
+      ("output-rec,R", po::value<string>(&rec_out), "output recombination map for pedigree to this file")
+      ("niteration", po::value<int>(&niteration)->default_value(100), "maximum number of EM iterations for parameter estimation");
 
     po::variables_map vm;        
     po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -100,7 +101,7 @@ int main(int argc,char **argv) {
       cout <<"WARNING: You have not specified a genetic map! This is not recommended.\nRecombination rate will be set to 1.19 cM/Mb. (sex averaged)"<<endl;
 
     //    pedhap ph(haps,fam,gm);    
-    pedhap ph(haps,gm);    
+    pedhap ph(haps,gm,niteration);    
     cout << "Correcting haplotypes based on pedigree structure..."<<endl;
     ph.correct();
 

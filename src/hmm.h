@@ -2,7 +2,6 @@
 #include "hapmodule.h"
 #include "utilityfunc.h"
 
-#define NITERATION 100
 #define DEBUG 0
 
 
@@ -21,7 +20,7 @@ class geneticMap{
 class DuoHMM{
  public:
   DuoHMM(vector<int> & positions, geneticMap & gm);
-  int nsnp,K;
+  int nsnp,K,NITERATION;
 
   double error,switch1,switch2;//parameters
   unsigned char **parent,**child;//pointers to duo haps
@@ -39,6 +38,8 @@ class DuoHMM{
   double *rho;
 
   int setHaps(unsigned char **parental_haplotypes,unsigned char **child_haplotypes,string sex);
+  void setIterations(int n);
+
   int EM(int niteration);
   int estimateRecombination();
 
@@ -65,7 +66,7 @@ class DuoHMM{
 class TrioHMM {
  public:
   TrioHMM(vector<int> & positions, geneticMap & gm);
-  int nsnp,K;
+  int nsnp,K,NITERATION;
 
   double error,switch_child,switch_mum,switch_dad;//parameters
   unsigned char **dad, **mum, **child;//pointers to duo haps
@@ -81,6 +82,7 @@ class TrioHMM {
   vector <double> recombinationPat;
   int setHaps(unsigned char **dadptr,unsigned char **mumptr,unsigned char **childptr);
   int EM(int niteration);
+  void setIterations(int n);
 
   //F-B VARIABLES
   vector < vector<double> > alpha;
