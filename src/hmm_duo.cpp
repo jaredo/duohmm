@@ -24,14 +24,17 @@ geneticMap::geneticMap(string fname){
       inf2 >> tmp2;
       inf2 >> tmp3;    
       //    if(DEBUG>0) 
-      //    cout << tmp1 <<"\t" <<tmp2<<"\t"<<tmp3<<endl;
+      //      cout << tmp1 <<"\t" <<tmp2<<"\t"<<tmp3<<endl;
       pos.push_back(tmp1);
       cM.push_back(tmp3);
       nsnp++;
     }
-    float     maxpos = 1e9;
+    float     maxpos = pos[pos.size()-1] + 5e6;
+    float last_cm = cM[cM.size()-1] + 5*1.19;
+
     pos.push_back(maxpos);
-    cM.push_back(maxpos * 1.19);
+    cM.push_back(last_cm);
+    //    cout << maxpos << " " << last_cm<<endl;
   }
 }
 
@@ -47,10 +50,16 @@ geneticMap::geneticMap() {
 double geneticMap::interpolate(int position) {
   int i=0;
   while(pos[i]<position) {
-    //    cout << i << " "  << pos[i] << " " << position << endl;
+    //cout << i << " "  << pos[i] << " " << position << endl;
+    if(i>=pos.size()) {
+      cerr << "ERROR: marker position was outside the range of provided genetic map"<<endl;
+      cerr << "Is your map the appropriate chromosome and build?" << endl;
+      cout << pos[i] <<endl;
+      exit(1);
+    }
     i++;
   }
-  //  cout << cM[i-1]  << " + " << "("<<cM[i]<<"-"<<cM[i-1]<<")*"<<"("<<position<<" - "<<pos[i-1]<<")/"<<"("<<pos[i]<<" - "<<pos[i-1]<<") )"<<endl;
+  //cout << cM[i-1]  << " + " << "("<<cM[i]<<"-"<<cM[i-1]<<")*"<<"("<<position<<" - "<<pos[i-1]<<")/"<<"("<<pos[i]<<" - "<<pos[i-1]<<") )"<<endl;
   return(  cM[i-1] + (cM[i]-cM[i-1])*(double)(position-pos[i-1])/(double)(pos[i]-pos[i-1]) );
 }
 
@@ -86,8 +95,8 @@ DuoHMM::DuoHMM(vector<int> & positions, geneticMap & gm)
   female_norho.resize(nsnp);
 
   for(int i=0;i<nsnp-1;i++) {
-    if(DEBUG>0)
-      if(i<100)
+    if(DEBUG>1)
+      if(i>55900 & i< 56000100)
 	cout << i << " " << positions[i] << " " << cM[i]<<endl;
 
     r = (cM[i+1]-cM[i])/100.;
@@ -362,8 +371,14 @@ int DuoHMM::estep() {
   }
 
   double aij;
-  for(int l=0;l<nsnp-1;l++) {
-    assert(rho[l]>=0.0 && rho[l]<1.);
+  for(int l=0;l<(nsnp-1);l++) {
+    assert(l<(nsnp-1));
+    if(!(rho[l]>=0.0 && rho[l]<1.)) {
+      cerr << "ERROR BAD RECOMBINATION RATE AT MARKER " << l << " rho = "<<rho[l]<<endl;
+      cerr << cM[l] << " " << cM[l+1]<<endl;
+      exit(1);
+    }
+
     denominator = 0.0;
 
     for(int i2=0;i2<2;i2++) {

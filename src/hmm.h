@@ -4,7 +4,6 @@
 
 #define DEBUG 0
 
-
 class geneticMap{
  public:
   geneticMap(string fname);

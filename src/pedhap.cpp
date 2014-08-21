@@ -130,8 +130,8 @@ int pedhap::phase(string child) {
 int pedhap::minRecombinant(string parent) {
   int minsib = 2;
   assert(ped->sampleinfo.count(parent));
-
-  if(ped->sampleinfo[parent].kids.size()<minsib) 
+  int nkid = ped->sampleinfo[parent].kids.size();
+  if(nkid<minsib)
     return(0);//not enough kids.
 
   /*
@@ -164,7 +164,7 @@ int pedhap::minRecombinant(string parent) {
 	  if(stateseq[key][prevhet]/2 !=stateseq[key][l]/2)
 	    nrec++;
 	}
-	if(nrec>minsib/2) {
+	if(nrec>nkid/2) {
 	  if(DEBUG>0) cout << parent << " " << nrec <<  " " << l << " " << haps->positions[l]<<endl;
 	  unswitch(p,l,nsnp);
 	}
