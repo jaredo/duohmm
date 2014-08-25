@@ -4,7 +4,7 @@ endif
 
 CC = g++
 LFLAGS = -L$(BOOST_ROOT)/lib -lz -lboost_iostreams  -lboost_program_options
-IFLAGS = -O3  -I$(BOOST_ROOT)/include
+IFLAGS =  -I$(BOOST_ROOT)/include
 
 release: CFLAGS = -O3 $(IFLAGS)
 release: duohmm
