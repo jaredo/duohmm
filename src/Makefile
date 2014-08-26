@@ -3,7 +3,8 @@ ifndef BOOST_ROOT
 endif
 
 CC = g++
-LFLAGS = -L$(BOOST_ROOT)/lib -lz -lboost_iostreams  -lboost_program_options
+#LFLAGS = -L$(BOOST_ROOT)/lib -lz -lboost_iostreams  -lboost_program_options
+LFLAGS = -lz $(BOOST_ROOT)/lib/libboost_iostreams.a $(BOOST_ROOT)/lib/libboost_program_options.a
 IFLAGS =  -I$(BOOST_ROOT)/include
 
 release: CFLAGS = -O3 $(IFLAGS)

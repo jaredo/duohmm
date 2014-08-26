@@ -1,6 +1,0 @@
-2014-03-23 
-	* Initial release 0.1.2
-2014-10-05
-	* Minor bugfix. There was an issue when chip SNPs had positions beyond the end of the geneticmap
-	
-	
