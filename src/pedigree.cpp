@@ -25,9 +25,9 @@ int pedigree::fromSample(string fname,vector<string> & ids) {
   count=0;
   while(iss) {
     iss >> field;
-    if(field.compare("father")==0)
+    if(field.compare("father")==0||"ID_father")
       dadidx=count;
-    if(field.compare("mother")==0)
+    if(field.compare("mother")==0||"ID_mother")
       mumidx=count;
     if(field.compare("sex")==0)
       sexidx=count;
