@@ -1,0 +1,164 @@
+body {
+	padding: 0; /* Gets rid of the automatic padding */
+	margin: 0;	/*	on HTML documents */
+	font-family: Lucida Grande, Helvetica, Arial, sans-serif;
+	font-size: 12px;
+}
+
+#navigation {
+  position: fixed;
+  left: 0;
+  width: 200px;
+  color: #ccffff;
+  height: 2000px;
+  text-align: center;
+  padding-top: 0px;
+  /* Adds the transparent background */
+  background-color: rgba(215, 250, 250, 1);
+  color: rgba(255, 255,255 , 1);
+  line-height: 175%;
+}
+
+#navigation a {
+	font-size: 14px;
+	padding-left: 0px;
+	padding-right: 0px;
+	color: #3366ff;
+	text-decoration: none;
+}
+
+#navigation a:hover {
+	color: grey;
+}
+
+/* Main content attributes */
+
+#content {
+    width: 800px;
+    padding-left: 80px;
+    padding-bottom: 30px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 130%;
+}
+
+#content p {
+    font-family: Helvetica,Arial,sans-serif;
+    font-size: 1.3em;
+    line-height: 1.4em;
+    margin: 20px 0 20px 0;
+}
+
+#content p.screentext {
+    background-color: #CCFFFF;
+    font-family: Courier New,Courier,monospace;
+    font-weight: bold;
+    font-size: 1.25em;
+    padding: 10px 0 10px 10px;
+}
+
+#screentext {
+    background-color: green;
+    font-family: Courier New,Courier,monospace;
+    font-weight: bold;
+    font-size: 1.25em;
+}
+
+#content h2 {
+    font-family: Helvetica,Arial,sans-serif;
+    font-size: 2.0em;
+    color: #FF0000;
+    padding-top: 5px;
+    padding-bottom: 10px;
+}
+
+#content h3 {
+    font-family: Helvetica,Arial,sans-serif;
+    font-size: 1.6em;
+    color: #008B00;
+    padding-top: 10px;
+    padding-bottom: 0px;
+}
+
+#content h4 {
+    font-family: Helvetica,Arial,sans-serif;
+    font-weight: bold;
+    font-size: 1.4em;
+    color: #8A0808;
+    padding-top: 8px;
+    padding-bottom: 0px;
+    text-transform: uppercase;
+}
+
+#content h5 {
+    font-family: Helvetica,Arial,sans-serif;
+    font-weight: bold;
+    font-size: 1.4em;
+    padding-top: 5px;
+    padding-bottom: 0px;
+}
+
+#content ul {
+    list-style: disc;
+    margin: 15px 0 20px 0;
+    font-family: Helvetica,Arial,sans-serif;
+    font-size: 1.3em;
+    line-height: 1.3em;
+}
+
+#content ol {
+    type: 1;
+    margin: 15px 0 20px 0;
+    font-family: Helvetica,Arial,sans-serif;
+    font-size: 1.3em;
+    line-height: 1.3em;
+}
+
+#content li {
+    margin: 15px 0 15px 25px;
+}
+
+#content ul p {
+    background-color: #CCFFFF;
+    font-family: Courier New,Courier,monospace;
+    font-weight: bold;
+    font-size: 0.95em;
+    padding: 10px 0 10px 10px;
+}
+
+#content table, th, td {
+    background-color: white;
+    border-color: gray;
+    border-style: outset;
+    border-width: 3px;
+    border-spacing: 0px;
+}
+
+#content th, td {
+    border-style: inset;
+    border-width: 1px;
+    padding: 6px;
+    vertical-align: top;
+    font-family: Helvetica,Arial,sans-serif;
+    text-align: left;
+}
+
+#content th {
+    background-color: #CCFFFF;
+    font-weight: bold;
+}
+
+#content td {
+    background-color: white;
+}
+
+#content td.screentext {
+    font-family: Courier New,Courier,monospace;
+    font-weight: bold;
+    font-size: 0.95em;
+}
+
+#content img {
+    padding-top: 20px;
+    padding-bottom: 30px;
+}

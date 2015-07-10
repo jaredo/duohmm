@@ -1,0 +1,355 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type">
+    <link rel="stylesheet" href="main.css" type="text/css">
+    <title>DuoHMM</title>
+  </head>
+  <body style="color: rgb(0, 0, 0); background-color: rgb(255,255,255);"
+    alink="#3333ff" bgcolor="#33ffff" link="#3333ff" text="#000000"
+    vlink="#3333ff">
+    <!-------------------------------------------------------------------------------------------------------------------------------------------->
+    <!-------------------------------------------------------------------------------------------------------------------------------------------->
+    <!--------------------------------------------------------LEFT MENU--------------------------------------------------------------------------->
+    <!-------------------------------------------------------------------------------------------------------------------------------------------->
+    <!-------------------------------------------------------------------------------------------------------------------------------------------->
+    <div id="navigation"> <br>
+      <font color="black" size="5em"> <b>duoHMM</b> </font> <br>
+      <br>
+      <div style="margin-left:10px;" align="left"> <font
+          color="#3366ff"><a href="#home"><u><b>Overview</b></u></a></font>
+        <br>
+        <font color="#3366ff"><a href="#download"><b>Download</b></a></font>
+        <br>
+        <font color="#3366ff"><a href="#contact"><b>Contact</b></a></font>
+        <br>
+        <font color="#3366ff"><a href="#options"><b>Options</b></a></font>
+        <br>
+        <font color="#3366ff"><a href="#examples"><b>Examples</b></a></font>
+        <br>
+        <br>
+        <font color="purple">Last update: <font face="Courier New,
+            Courier, monospace"><b>24</b></font> Mar 2014</font> <br>
+      </div>
+    </div>
+    <!-------------------------------------------------------------------------------------------------------------------------------------------->
+    <!-------------------------------------------------------------------------------------------------------------------------------------------->
+    <!--------------------------------------------------------MAIN PANEL-------------------------------------------------------------------------->
+    <!-------------------------------------------------------------------------------------------------------------------------------------------->
+    <!-------------------------------------------------------------------------------------------------------------------------------------------->
+    <p align="center"><br>
+      <br>
+      <font color="#339999" size="200%"><b>duoHMM</b></font><br>
+      <br>
+    </p>
+    <div id="content"> <a name="home"></a>
+      <!-- <h2>DuoHMM for complex pedigrees</h2> -->
+      <!-- <h3>Overview</h3> -->
+      <p><b>duoHMM </b>is a software package for post-processing
+        haplotypes estimated by <a
+href="https://mathgen.stats.ox.ac.uk/genetics_software/shapeit/shapeit.html"><b>SHAPEIT</b></a>
+        when run on related individuals that<br>
+      </p>
+      <ol>
+        <li>correct phasing errors in the haploptypes to make them
+          consistent with a pedigree structure.<br>
+        </li>
+        <li>detect recombination events</li>
+        <li>detecting genotype errors</li>
+      </ol>
+      <p> The remainder of this page demonstrates how to apply this
+        pipeline to some example data. <br>
+        <br>
+        If you use <b>duoHMM</b> in your research please cite:<br>
+        <br>
+        J. O'Connell et al. (2013) A general approach for haplotype
+          phasing across the full spectrum of relatedness. PLoS
+      Genetics. 10(4) <a href="http://www.plosgenetics.org/article/info%3Adoi%2F10.1371%2Fjournal.pgen.1004234">doi:10.1371/journal.pgen.1004234</a>
+        <br>
+        <br>
+        <font color="red"><u><b>NOTE</b></u><u> </u>: If you just wish
+          to use <b>duoHMM </b>for phasing complex pedigrees, this
+          functionality is integrated into <b>SHAPEIT2 </b>and can be
+          enabled via the </font><font color="red"><tt><b>--duohmm</b></tt></font><font
+          color="red"> flag. See more details <a
+href="https://mathgen.stats.ox.ac.uk/genetics_software/shapeit/shapeit.html">here.</a>
+        </font> </p>
+      <hr> <a name="download"></a>
+      <h2>Download</h2>
+      <p><span style="color: rgb(0, 0, 0); font-family: Helvetica,
+          Arial, sans-serif; font-size: 16px; font-style: normal;
+          font-variant: normal; font-weight: normal; letter-spacing:
+          normal; line-height: 21.84000015258789px; orphans: auto;
+          text-align: start; text-indent: 0px; text-transform: none;
+          white-space: normal; widows: auto; word-spacing: 0px;
+          -webkit-text-stroke-width: 0px; background-color: rgb(255,
+          255, 255); display: inline !important; float: none;"><span
+            style="color: rgb(0, 0, 0); font-family: Helvetica, Arial,
+            sans-serif; font-size: 16px; font-style: normal;
+            font-variant: normal; font-weight: normal; letter-spacing:
+            normal; line-height: 21.84000015258789px; orphans: auto;
+            text-align: start; text-indent: 0px; text-transform: none;
+            white-space: normal; widows: auto; word-spacing: 0px;
+            -webkit-text-stroke-width: 0px; background-color: rgb(255,
+            255, 255); display: inline !important; float: none;">Pre-compiled<span
+              class="Apple-converted-space"> <b>duoHMM</b></span></span><span
+            style="color: rgb(0, 0, 0); font-family: Helvetica, Arial,
+            sans-serif; font-size: 16px; font-style: normal;
+            font-variant: normal; font-weight: normal; letter-spacing:
+            normal; line-height: 21.84000015258789px; orphans: auto;
+            text-align: start; text-indent: 0px; text-transform: none;
+            white-space: normal; widows: auto; word-spacing: 0px;
+            -webkit-text-stroke-width: 0px; background-color: rgb(255,
+            255, 255); display: inline !important; float: none;"><span
+              class="Apple-converted-space"> </span>binaries and
+            example files can be downloaded from the links below.</span><br>
+        </span> </p>
+      <table style="background-color: white; border: 3px outset gray;
+        border-spacing: 0px; font-family: 'Lucida Grande', Helvetica,
+        Arial, sans-serif; letter-spacing: normal; orphans: auto;
+        text-indent: 0px; text-transform: none; widows: auto;
+        word-spacing: 0px; -webkit-text-stroke-width: 0px; width:
+        714px;">
+        <tbody>
+          <tr>
+            <th style="background-color: rgb(204, 255, 255); border: 1px
+              inset gray; border-spacing: 0px; padding: 6px;
+              vertical-align: top; font-family: Helvetica, Arial,
+              sans-serif; text-align: left; font-weight: bold;">Platform</th>
+            <th style="background-color: rgb(204, 255, 255); border: 1px
+              inset gray; border-spacing: 0px; padding: 6px;
+              vertical-align: top; font-family: Helvetica, Arial,
+              sans-serif; text-align: left; font-weight: bold;">File</th>
+          </tr>
+          <tr>
+            <td style="background-color: white; border: 1px inset gray;
+              border-spacing: 0px; padding: 6px; vertical-align: top;
+              font-family: Helvetica, Arial, sans-serif; text-align:
+              left;">Linux (x86_64) Static Executable</td>
+            <td class="screentext" style="background-color: white;
+              border: 1px inset gray; border-spacing: 0px; padding: 6px;
+              vertical-align: top; font-family: 'Courier New', Courier,
+              monospace; text-align: left; font-weight: bold; font-size:
+              0.95em;"><a href="https://mathgen.stats.ox.ac.uk/genetics_software/duohmm/duohmm_0.1.4.tar.gz">duohmm_0.1.4.tar.gz</a></td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      <br>
+      <hr> <a name="contact"></a>
+      <h2>Contact</h2>
+      <p>To ask a question about <b>duoHMM</b> please subscribe to the
+        <b><a
+            href="https://www.jiscmail.ac.uk/cgi-bin/webadmin?A0=OXSTATGEN">OXSTATGEN
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            mailing list</a></b>.</p>
+      <p>If you experience any problems with <b>duoHMM</b>, before
+        emailing the mail list please:</p>
+      <ol>
+        <li>Make sure you are using the latest version since your
+          problem may have already been fixed</li>
+        <li>Check carefully the screen output and the log file. The
+          problem may be reported here since they both contain many
+          details about what is going on.</li>
+      </ol>
+      <p>If the problem persists, ask your question on the OXSTATGEN
+        mailing list and we will be happy to answer!</p>
+      <br>
+      <br>
+      <hr> <a name="options"></a>
+      <h2>Options</h2>
+      <p> Here is a list of the command line option for <b>duoHMM</b><br>
+      </p>
+      <table width="100%">
+        <tbody>
+          <tr>
+            <th bgcolor="#33ffff" width="30%">Option [short version]<br>
+            </th>
+            <th bgcolor="#33ffff" width="70%">Description</th>
+          </tr>
+          <tr>
+            <td> <b><tt> --haps [-H]</tt></b> </td>
+            <td> SHAPEIT2 haplotype file </td>
+          </tr>
+          <tr>
+            <td> <b><tt> --input-gen [-M]&nbsp;</tt></b> </td>
+            <td> genetic map file in SHAPEIT2/Impute format</td>
+          </tr>
+          <tr>
+            <td> <b><tt> --output-hap [-O]</tt></b><b><tt><br>
+                </tt></b> </td>
+            <td> output pedigree corrected haplotypes this file</td>
+          </tr>
+          <tr>
+            <td> <b><tt> --output-generr [-G]</tt></b> </td>
+            <td> output possible genotyping errors to this file</td>
+          </tr>
+          <tr>
+            <td> <b><tt> --output-rec [-R]</tt></b> </td>
+            <td> output recombination map for pedigree to this file</td>
+          </tr>
+        </tbody>
+      </table>
+      <hr> <a name="examples"></a>
+      <h2>Examples</h2>
+      <h3>Data quality control</h3>
+      <p> We assume your data is in plink binary format with the
+        pedigree relationships specified in the respective plink .fam
+        file as plink provides useful pedigree functionality. Before
+        phasing, genotypes that are inconsistent with Mendelian
+        inheritance should be removed. High rates of Mendel
+        inconsistencies are likely to indicate an incorrect family
+        relationship. The <a
+          href="http://pngu.mgh.harvard.edu/%7Epurcell/plink/summary.shtml#mendel">plink
+
+          website</a> provides details on how to investigate Mendel
+        consistency within families. </p>
+      <p> Once you are confident that all your family relationships are
+        correct. Simply run this plink command to remove any Mendel
+        inconsistencies: </p>
+      <p class="screentext"> ./plink --noweb \<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; --bfile
+        duohmm-example \<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; --me 1 1 \<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; --set-me-missing \<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; --make-bed \<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; --out
+        duohmm-example-nomendel </p>
+      <p> now the data is ready to be input into <b>SHAPEIT2</b>. </p>
+      <h3>Phasing with SHAPEIT2</h3>
+      <p> We simple run SHAPEIT2 using the <b>--noped</b> flag so that
+        the pedigree relationships are completely ignored. We have also
+        found it to be (slightly) advantageous to use a larger than
+        default window when large amounts of IBD sharing are present
+        hence we use the -W 5 here: </p>
+      <p class="screentext"> ./shapeit --noped \<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -B
+        duohmm-example-nomendel \<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -M
+        genetic_map_chr10_combined_b37.txt \<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -W 5 \<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        --output-max duohmm-example \<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        --output-graph duohmm-example.graph </p>
+      <h3>Integrating pedigree structure with duoHMM</h3>
+      <p>We can use the <b>duoHMM </b>to ensure haplotypes are
+        consistent with pedigree structure, producing more accurate
+        haplotypes. This process is straightforward, simply run the
+        command:</p>
+      <p class="screentext">./duohmm -H duohmm-example \<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -M
+        genetic_map_chr10_combined_b37.txt \<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -O
+        duohmm-example-corrected </p>
+      <p> This produces duohmm-example-corrected.haps which is a
+        standard <b>SHAPEIT2</b> format haplotype file that has been
+        corrected for pedigree structure. An additional benefit is that
+        a child's haplotypes are now ordered with the paternal haplotype
+        first and the maternal haplotype second.<br>
+      </p>
+      <p><font color="#ff0000"><b>NOTE </b></font>: this feature has
+        been built into the <b>SHAPEIT</b> software (via the <tt><b>--duohmm</b></tt>
+        flag). So if you just want to create a set of pedigree-correct
+        haplotypes then we would advise you to use that option. See <a
+href="https://www.mathgen.stats.ox.ac.uk/shapeit/shapet.html#family">here</a>
+        for more details.<br>
+      </p>
+      <h3>Detecting subtle genotyping errors with duoHMM </h3>
+      <p>Not all genotyping errors will produce a Mendelian
+        inconsistency. <b>duoHMM</b> can identify genotypes that are
+        unlikely within a duo/trio based on patterns of recombination.
+        Likely genotyping errors can be detected by running the command:</p>
+      <p class="screentext">./duohmm -H duohmm-example \<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -M
+        genetic_map_chr10_combined_b37.txt \<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -G
+        duohmm-example.generr </p>
+      <p> The file<b> </b><b><tt>duohmm-example.generr</tt></b>
+        contains four columns; the individual ID, paternal ID, maternal
+        ID, marker tag, marker position and the probability of error in
+        this proband at this position:</p>
+      <pre><p class="screentext">
+ID      father  mother  RSID1   POS         PROB_ERROR
+ID001   0       ID024   10      2055591     1
+ID001   0       ID024   10      2566085     1
+ID001   0       ID024   10      4517381     1
+ID001   0       ID024   10      9344681     1
+ID001   0       ID024   10      20128601    0.999892
+	  </p></pre>
+      <p> Markers with high probability are likely to be erroneous in
+        either the parent or the child (or both), it is not possible to
+        distinguish which individual contained the error. </p>
+      <h3>Detecting recombination crossovers with DuoHMM</h3>
+      <p> Detecting crossover events is more complicated as we need to
+        integrate over the uncertainty in phase. To do this, we need to
+        simulate haplotypes from the <b>SHAPEIT2</b> diploid graph
+        which is output by the<tt><b> --output-graph</b></tt> argument
+        (we included this earlier in our phasing example). <br>
+        <br>
+        We now will: </p>
+      <ol>
+        <li> Simulate ten haplotype sets from the <b>SHAPEIT2</b> graph
+          with different seeds </li>
+        <li> Calculate the recombination map each meiosis in the
+          haplotype sets using <b>duoHMM</b> </li>
+        <li> Use the python script mapavg.py to average over these maps
+        </li>
+      </ol>
+      <p></p>
+      <p class="screentext"> for i in {1..10};<br>
+        do<br>
+        &nbsp;&nbsp;./shapeit -convert --input-graph
+        duohmm-example.graph --output-sample sim${i} --seed ${i}<br>
+        &nbsp;&nbsp;./duohmm -H sim${i} -M
+        genetic_map_chr10_combined_b37.txt -R sim${i}.rec<br>
+        done<br>
+        <br>
+        python mapavg.py *.rec &gt; duohmm-example-recombinations.txt </p>
+      <p>The resulting output in <tt><b>d</b></tt><tt><b>uohmm-example-recombinations.txt</b></tt>
+        has five columns:</p>
+      <pre><p class="screentext">
+ CHILD PARENT    START      END PROB_RECOMBINATION
+ ID011  ID001  6526497  6543063          0.9997400
+ ID008  ID022 68442048 68482454          0.9941613
+ ID008  ID022 87537219 87684681          0.9995396
+ ID008  ID022 89965473 90008047          0.9995075
+ ID014  ID013  4522299 4575807           0.9721813
+ ID014  ID013 82866361 82979066          0.9776638
+</p></pre>
+      <p> The first two columns are the parent and child involved in the
+        meisosis, the START and END columns are the regions where a
+        crossover may have occurred (flanking heterozygote sites on the
+        parents) and the final column is the probability of a crossover
+        event occurring.<br>
+        <br>
+        <b>Note:</b> this routine has been shown to have good <i>specificity</i>,
+        that is it has low false positive rate when a high probability
+        threshold is used. The power to detect recombination events is
+        very dependendant on the structure of the pedigree. For example,
+        in a nuclear family with &gt;2 siblings most crossover events
+        should be detectable. Pedigrees with such structure are <i>informative</i>
+        towards recombination. <br>
+        <br>
+        We have also demonstrated some power to detect crossovers in <i>uninformative</i>
+        meisoses, however this is very dependant on how much more
+        distant IBD sharing is present in a cohort. </p>
+      <!----------------------------------------------------------------------------------------------------------------------------------->
+      <!-----------------------------------------------HOME-------------------------------------------------------------------------------->
+      <!----------------------------------------------------------------------------------------------------------------------------------->
+      <hr> </div>
+  </body>
+</html>
