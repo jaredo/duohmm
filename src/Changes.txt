@@ -1,5 +1,5 @@
 version 2014.11.16.0
-	*official release
+	*version for release
 
 version 2014.08.25.1
 	*fixed a bug in the minimum recombinant routine affects families with >4 children
