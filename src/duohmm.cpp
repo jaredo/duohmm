@@ -16,7 +16,7 @@
 #include <boost/program_options.hpp>
 namespace po = boost::program_options;
 
-#include "version.h"
+
 using namespace std;
 
 int main(int argc,char **argv) {
@@ -42,7 +42,7 @@ int main(int argc,char **argv) {
     cout << "DuoHMM: a post-hoc method for integrating extended pedigree information with SHAPEIT2 haplotypes\n" << endl;
     cout << "\t* Authors: Jared O'Connell, Olivier Delaneau and Jonathan Marchini" << endl;
     cout << "\t* Webpage: http://www.stats.ox.ac.uk/~marchini/software/gwas/gwas.html" << endl;
-    cout << "\t* Version: " << version << endl;
+    cout << "\t* Version: " << VERSION << endl;
     cout << "\t* Contact: jaredoconnell@gmail.com" << endl;
     cout << endl;
 

@@ -7,6 +7,8 @@ CC = g++
 LFLAGS = -lz $(BOOST_ROOT)/lib/libboost_iostreams.a $(BOOST_ROOT)/lib/libboost_program_options.a
 IFLAGS =  -I$(BOOST_ROOT)/include
 
+VERSION := $(shell git describe --dirty --always --tags)
+
 release: CFLAGS = -O3 $(IFLAGS)
 release: duohmm
 
@@ -14,7 +16,7 @@ debug: CFLAGS = -g -Wall $(IFLAGS)
 debug: duohmm 
 
 duohmm: pedhap.o hapmodule.o utilityfunc.o pedigree.o hmm_duo.o hmm_trio.o  duohmm.cpp 
-	$(CC) duohmm.cpp pedhap.o hapmodule.o utilityfunc.o pedigree.o hmm_duo.o hmm_trio.o -o duohmm $(CFLAGS)  $(LFLAGS)
+	$(CC) -DVERSION=\"$(VERSION)\" duohmm.cpp pedhap.o hapmodule.o utilityfunc.o pedigree.o hmm_duo.o hmm_trio.o -o duohmm $(CFLAGS)  $(LFLAGS)
 test: pedhap.o hapmodule.o utilityfunc.o pedigree.o hmm_duo.o hmm_trio.o test.cpp
 	$(CC)  test.cpp pedhap.o hapmodule.o utilityfunc.o pedigree.o hmm_duo.o hmm_trio.o -o test $(CFLAGS)
 pedhap.o: pedhap.h pedhap.cpp utilityfunc.o pedigree.o hmm_duo.o hmm_trio.o
