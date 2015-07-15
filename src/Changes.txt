@@ -1,5 +1,5 @@
 2015-07-15
-	*version v0.1.6
+	*version v0.1.7
 	*fixed a bug when reading in pedigree information
 	
 2014-08-25
