@@ -1,7 +1,9 @@
-version 2014.11.16.0
-	*version for release
-
-version 2014.08.25.1
+2015-07-15
+	*version v0.1.6
+	*fixed a bug when reading in pedigree information
+	
+2014-08-25
+	*version v0.1.5
 	*fixed a bug in the minimum recombinant routine affects families with >4 children
 	*new version numbering
 
