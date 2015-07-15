@@ -1,4 +1,4 @@
-VERSION=`grep "define version" src/*cpp | awk '{print substr($3,2,length($3)-2)}'`
+VERSION=`git describe  --always --tags`
 echo BUILDING ${VERSION}
 cd src
 make clean

@@ -7,7 +7,7 @@ CC = g++
 LFLAGS = -lz $(BOOST_ROOT)/lib/libboost_iostreams.a $(BOOST_ROOT)/lib/libboost_program_options.a
 IFLAGS =  -I$(BOOST_ROOT)/include
 
-VERSION := $(shell git describe --dirty --always --tags)
+VERSION := $(shell git describe  --always --tags)
 
 release: CFLAGS = -O3 $(IFLAGS)
 release: duohmm
