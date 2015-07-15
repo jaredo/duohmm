@@ -5,15 +5,13 @@
 2014-08-25
 	*version v0.1.5
 	*fixed a bug in the minimum recombinant routine affects families with >4 children
-
-version 0.1.4
+2014-05-22
+	*version 0.1.4
 	*minor bug fix to handle situation where SNPs have the exact same genetic position
 
-version 0.1.3
+2014-05-10
+	*version 0.1.3
 	*minor bug fix to handle situation where a SNPs is outside the range of the supplied genetic map
 
-2014-05-10
-	* Minor bugfix. There was an issue when chip SNPs had positions beyond the end of the geneticmap
-
 2014-03-23
-	* Initial release 0.1.2
+	* Initial release with publication 0.1.2
