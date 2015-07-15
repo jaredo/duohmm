@@ -5,7 +5,6 @@
 2014-08-25
 	*version v0.1.5
 	*fixed a bug in the minimum recombinant routine affects families with >4 children
-	*new version numbering
 
 version 0.1.4
 	*minor bug fix to handle situation where SNPs have the exact same genetic position
