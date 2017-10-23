@@ -155,5 +155,5 @@ void ofile::close() {
 
 bool fileexists(string fname){
   ifstream ifile(fname.c_str());
-  return ifile;
+  return ifile.is_open();
 }

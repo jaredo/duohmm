@@ -1,15 +1,15 @@
-ifndef BOOST_ROOT
-    $(error BOOST_ROOT is undefined)
-endif
+# ifndef BOOST_ROOT
+#     $(error BOOST_ROOT is undefined)
+# endif
 
 CC = g++
-#LFLAGS = -L$(BOOST_ROOT)/lib -lz -lboost_iostreams  -lboost_program_options
-LFLAGS = -lz $(BOOST_ROOT)/lib/libboost_iostreams.a $(BOOST_ROOT)/lib/libboost_program_options.a
+LFLAGS = -L$(BOOST_ROOT)/lib -lz -lboost_iostreams  -lboost_program_options
+#LFLAGS = -lz $(BOOST_ROOT)/lib/libboost_iostreams.a $(BOOST_ROOT)/lib/libboost_program_options.a
 IFLAGS =  -I$(BOOST_ROOT)/include
 
 VERSION := $(shell git describe  --always --tags)
 
-release: CFLAGS = -O3 $(IFLAGS)
+release: CFLAGS = -O2 $(IFLAGS)
 release: duohmm
 
 debug: CFLAGS = -g -Wall $(IFLAGS)
@@ -17,7 +17,7 @@ debug: duohmm
 
 duohmm: pedhap.o hapmodule.o utilityfunc.o pedigree.o hmm_duo.o hmm_trio.o  duohmm.cpp 
 	$(CC) -DVERSION=\"$(VERSION)\" duohmm.cpp pedhap.o hapmodule.o utilityfunc.o pedigree.o hmm_duo.o hmm_trio.o -o duohmm $(CFLAGS)  $(LFLAGS)
-test: pedhap.o hapmodule.o utilityfunc.o pedigree.o hmm_duo.o hmm_trio.o test.cpp
+unit_test: pedhap.o hapmodule.o utilityfunc.o pedigree.o hmm_duo.o hmm_trio.o test.cpp
 	$(CC)  test.cpp pedhap.o hapmodule.o utilityfunc.o pedigree.o hmm_duo.o hmm_trio.o -o test $(CFLAGS)
 pedhap.o: pedhap.h pedhap.cpp utilityfunc.o pedigree.o hmm_duo.o hmm_trio.o
 	$(CC) -c pedhap.cpp $(CFLAGS) 
@@ -31,9 +31,10 @@ hmm_duo.o:  hmm.h hmm_duo.cpp
 	$(CC) -c hmm_duo.cpp $(CFLAGS)
 hmm_trio.o:  hmm.h hmm_trio.cpp
 	$(CC) -c hmm_trio.cpp $(CFLAGS)
-
-all: duohmm test
+test: duohmm
+	cd ../test/;bash -e test.sh
+all: duohmm 
 
 clean:
 	rm *.o
-	rm duohmm test
+	rm -f duohmm unit_test ../test/observed.*
