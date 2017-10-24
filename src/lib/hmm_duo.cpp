@@ -35,11 +35,9 @@ geneticMap::geneticMap(string fname){
 
 #ifdef SHAPEIT
 geneticMap::geneticMap(genhap_set & GH) {
-  pos.reserve(nsnp+1);
-  cM.reserve(nsnp+1);
   pos.push_back(0);
   cM.push_back(0.0);
-  for(int l=0;l<nsnp;l++) {
+  for(size_t l=0;l<GH.mapG->vec_pos.size();l++) {
     pos.push_back(GH.mapG->vec_pos[l]->bp);
     cM.push_back(GH.mapG->vec_pos[l]->cm);
   }
