@@ -3,7 +3,10 @@
 #include "pedigree.h"
 #include "hmm.h"
 
+#ifndef SHAPEIT
 #define VERBOSE 1
+#endif
+
 #ifdef SHAPEIT
 #include <globals.h>
 #define VERBOSE 0

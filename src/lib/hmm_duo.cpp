@@ -36,7 +36,7 @@ geneticMap::geneticMap(string fname){
   }
 }
 
-#ifdef SHAPEIT2
+#ifdef SHAPEIT
 geneticMap::geneticMap(genhap_set & GH) {
   nsnp = GH.mapG->vec_pos.size();
   pos.resize(nsnp);

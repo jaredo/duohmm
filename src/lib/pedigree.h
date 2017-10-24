@@ -7,6 +7,9 @@
 #include <sstream>      // std::istringstream
 #include <string>       // st
 
+#ifndef SHAPEIT
+#define VERBOSE 1
+#endif
 
 #ifdef SHAPEIT
 #define VERBOSE 0
