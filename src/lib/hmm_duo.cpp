@@ -1,12 +1,11 @@
 #include "hmm.h"
 
 geneticMap::geneticMap(string fname){
+  pos.push_back(0);
+  cM.push_back(0.0);    
   if(fname.compare("")==0) {
-    pos.push_back(0);
     pos.push_back(4000e6);
-    cM.push_back(0.0);
     cM.push_back(4000. * 1.19);
-    nsnp = 2;
   } else {
     ifstream inf2(fname.c_str());
     if(!inf2) {
@@ -16,7 +15,6 @@ geneticMap::geneticMap(string fname){
     int tmp1;
     double tmp2,tmp3;
     inf2.ignore(1000,'\n');
-    nsnp = 0;
     while(inf2) {
       inf2 >> tmp1;
       inf2 >> tmp2;
@@ -25,26 +23,27 @@ geneticMap::geneticMap(string fname){
       //      cout << tmp1 <<"\t" <<tmp2<<"\t"<<tmp3<<endl;
       pos.push_back(tmp1);
       cM.push_back(tmp3);
-      nsnp++;
     }
     float     maxpos = pos[pos.size()-1] + 5e6;
     float last_cm = cM[cM.size()-1] + 5*1.19;
-
     pos.push_back(maxpos);
     cM.push_back(last_cm);
     //    cout << maxpos << " " << last_cm<<endl;
   }
+  nsnp = pos.size();
 }
 
 #ifdef SHAPEIT
 geneticMap::geneticMap(genhap_set & GH) {
-  nsnp = GH.mapG->vec_pos.size();
-  pos.resize(nsnp);
-  cM.resize(nsnp);
+  pos.reserve(nsnp+1);
+  cM.reserve(nsnp+1);
+  pos.push_back(0);
+  cM.push_back(0.0);
   for(int l=0;l<nsnp;l++) {
-    pos[l]=(GH.mapG->vec_pos[l]->bp);
-    cM[l]=(GH.mapG->vec_pos[l]->cm);
+    pos.push_back(GH.mapG->vec_pos[l]->bp);
+    cM.push_back(GH.mapG->vec_pos[l]->cm);
   }
+  nsnp = pos.size();
 }
 #endif
 
@@ -62,10 +61,13 @@ double geneticMap::interpolate(int position) {
   while(i<nsnp && pos[i]<=position) {
     i++;
   }
+  assert(i>0);
   if(i>=nsnp) {
     i--;
+#ifndef SHAPEIT
     cerr << "WARNING: marker at position "<<position<< " was outside the range of provided genetic map"<<endl;
     cerr << "Is your map the appropriate chromosome and build?" << endl;
+#endif
   }
 
   return(  cM[i-1] + (cM[i]-cM[i-1])*(double)(position-pos[i-1])/(double)(pos[i]-pos[i-1]) );
@@ -74,8 +76,12 @@ double geneticMap::interpolate(int position) {
 int geneticMap::interpolate(vector<int> & positions,vector<double> & output){
   output.resize(positions.size());
 
-  for(size_t i=0;i<positions.size();i++) 
+  for(size_t i=0;i<positions.size();i++) {
     output[i] = interpolate(positions[i]);
+// #ifdef DEBUG
+//     cerr<<positions[i]<<"\t"<<output[i]<<endl;
+// #endif
+  }
 
   return(0);
 }

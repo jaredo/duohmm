@@ -91,7 +91,7 @@ int pedigree::fromSample(string fname,vector<string> & ids) {
   }
   cout << count << " samples in " << fname << endl;
   buildPeds();
-  delete header;
+  delete[] header;
   return 0;
 }
 
@@ -177,7 +177,6 @@ int pedigree::buildPeds() {
     }
   }
 
-  cout << pedigrees.size() << " distinct pedigrees found."<<endl;
   map<int,int> freq;
   for (vector<set<string> >::iterator it2=pedigrees.begin(); it2!=pedigrees.end(); it2++) {
     int n = it2->size();
@@ -194,10 +193,12 @@ int pedigree::buildPeds() {
 
   }
 
+#ifndef SHAPEIT
+  cout << pedigrees.size() << " distinct pedigrees found."<<endl;
   cout << "SIZE\tFREQUENCY"<<endl;
   for (map<int,int>::iterator it2=freq.begin(); it2!=freq.end(); it2++)
     cout << it2->first << "\t" << it2->second << endl;
-
+#endif
 
   return(0);
 }

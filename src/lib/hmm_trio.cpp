@@ -1,7 +1,5 @@
 #include "hmm.h"
 
-
-
 TrioHMM::TrioHMM(vector<int> & positions, geneticMap & gm)
 {
   double r;
