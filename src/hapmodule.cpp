@@ -30,7 +30,6 @@ Haplotypes::Haplotypes(string filename) {
     
   string line;
   int pos;
-  char c;
   int count = 0;
   //int *positions;
   ids.clear();

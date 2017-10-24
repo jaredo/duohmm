@@ -74,7 +74,7 @@ double geneticMap::interpolate(int position) {
 int geneticMap::interpolate(vector<int> & positions,vector<double> & output){
   output.resize(positions.size());
 
-  for(int i=0;i<positions.size();i++) 
+  for(size_t i=0;i<positions.size();i++) 
     output[i] = interpolate(positions[i]);
 
   return(0);
@@ -103,9 +103,6 @@ DuoHMM::DuoHMM(vector<int> & positions, geneticMap & gm)
   female_norho.resize(nsnp);
 
   for(int i=0;i<nsnp-1;i++) {
-    if(DEBUG>1)
-      if(i>55900 & i< 56000100)
-	cout << i << " " << positions[i] << " " << cM[i]<<endl;
 
     r = (cM[i+1]-cM[i])/100.;
     if(r<=0.0) r = 1e-13;//hack to handle positions with same genetic location (which shouldnt be in the snps in the first place)
@@ -242,7 +239,8 @@ int DuoHMM::backward() {
   return(0);
 }
 
-int DuoHMM::setHaps(unsigned char **parental_haplotypes,unsigned char **child_haplotypes,string sex) { 
+int DuoHMM::setHaps(unsigned char **parental_haplotypes,unsigned char **child_haplotypes,string sex) {
+  assert(parental_haplotypes!=nullptr && child_haplotypes!=nullptr);
   //  cout << sex << endl;
   assert(sex.compare("1")==0 || sex.compare("2")==0);
   parent = parental_haplotypes;

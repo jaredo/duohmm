@@ -91,7 +91,7 @@ int main(int argc,char **argv) {
       checkfiles.push_back(rec_out);
     }
     
-    for(int i=0;i<checkfiles.size();i++) {
+    for(size_t i=0;i<checkfiles.size();i++) {
       if(fileexists(checkfiles[i]))      {
 	cerr << "ERROR: " << checkfiles[i] <<" exists.  Will not overwrite.\nExiting..." <<endl;
 	return 1;

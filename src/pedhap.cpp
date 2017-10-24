@@ -73,7 +73,7 @@ int pedhap::phase(string child) {
     cout << "Phasing " << child << " - " << dad << " - " << mum << endl;
   }
   assert(ped->sampleinfo.count(dad)  ||  ped->sampleinfo.count(mum));
-  unsigned char **d,**m,**p;
+  unsigned char **d=nullptr,**m=nullptr,**p=nullptr;
   unsigned char **c = haps->getHap(child);
   pair<string,string> key,key1,key2;
   if(dad.compare("0")!=0 && mum.compare("0")!=0) {

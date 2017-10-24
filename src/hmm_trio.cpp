@@ -56,7 +56,8 @@ void TrioHMM::setIterations(int n) {
   NITERATION = n;
 }
 
-int TrioHMM::setHaps(unsigned char **dadptr,unsigned char **mumptr,unsigned char **childptr) { 
+int TrioHMM::setHaps(unsigned char **dadptr,unsigned char **mumptr,unsigned char **childptr) {
+  assert(dadptr!=nullptr && mumptr!=nullptr &&childptr!=nullptr);
   dad = dadptr;
   mum = mumptr;
   child = childptr;
@@ -659,7 +660,7 @@ int TrioHMM::estimateRecombination() {
       //      rho_dad = 0.5;
       rho_mum = 1 - exp(-female_multiplier*r);
       recp = 0.0;
-      double denominator=0,aij;//recombination probability
+      double denominator=0;//recombination probability
 
       for(int i2=0;i2<2;i2++) {
 	for(int j2=0;j2<2;j2++) {
