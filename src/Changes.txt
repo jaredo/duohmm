@@ -1,3 +1,5 @@
+2017-10-24
+	*added SHAPEIT2 integration directly to the duohmm master repository. The duohmm src directory can now be copied directly to SHAPEIT2 and will compile seemlessly
 2015-07-15
 	*version v0.1.7
 	*fixed a bug when reading in pedigree information
