@@ -16,6 +16,20 @@ int unswitch(unsigned char **h,int start,int stop) {
   return(0);
 }
 
+
+#ifdef SHAPEIT
+pedhap::pedhap(filter_writer & F,genhap_set & GH,string header1,string header2) {
+  if(VERBOSE) cout << "converting haps" <<endl;
+  haps =  new Haplotypes(F,GH);
+  ped = new  pedigree(F,GH, header1, header2,haps->ids);
+  if(VERBOSE) cout << "reading genetic map." <<endl;
+  gm = new geneticMap(GH);
+  duo =  new DuoHMM(haps->positions,*gm);
+  trio =  new TrioHMM(haps->positions,*gm);
+  nsnp = haps->positions.size();  
+}
+#endif
+
 //constructor
 pedhap::pedhap(string hap_filename,string pedigree_filename,string gm_filename) {
   haps =  new Haplotypes(hap_filename);
@@ -55,7 +69,9 @@ int pedhap::phase(string child) {
   assert(ped->sampleinfo.count(child));
   string dad = ped->sampleinfo[child].dad;
   string mum = ped->sampleinfo[child].mum;
-  cout << "Phasing " << child << " - " << dad << " - " << mum << endl;
+  if(VERBOSE>0)    {
+    cout << "Phasing " << child << " - " << dad << " - " << mum << endl;
+  }
   assert(ped->sampleinfo.count(dad)  ||  ped->sampleinfo.count(mum));
   unsigned char **d,**m,**p;
   unsigned char **c = haps->getHap(child);

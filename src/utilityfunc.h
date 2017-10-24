@@ -2,14 +2,12 @@
 #include <utility> 
 #include <vector>
 #include <bitset>
+#include <assert.h>
 
 #include <cmath> 
 #include <sys/stat.h>
 #include <fstream>
 #include <iostream>
-#include <boost/iostreams/filtering_stream.hpp>
-#include <boost/iostreams/filter/gzip.hpp>
-namespace io = boost::iostreams;
 
 using namespace std;
 
@@ -58,7 +56,7 @@ T **newMatrix(int nrow,int ncol) {
 
 
 template <class T>
-void delMatrix(T **mat,int nrow,int ncol) {
+void delMatrix(T **mat,int nrow) {
   for(int i=0;i<nrow;i++)
     delete[] mat[i];
   delete[] mat;
@@ -72,43 +70,6 @@ void printMatrix(T **H,int nrow,int ncol) {
     cout << endl;
   }
 }
-
-
-/******************************************************/
-/*                  INPUT FILE                        */
-/******************************************************/
-class ifile : public io::filtering_istream {
-private:
-	string file;
-	ifstream fd;
-
-public:
-	ifile();
-	ifile(string filename , bool binary = false);
-	~ifile();
-	string name();
-	bool open(string filename, bool binary = false);
-	bool readString(string &);
-	void close();
-};
-
-/******************************************************/
-/*                  OUTPUT FILE                       */
-/******************************************************/
-class ofile : public io::filtering_ostream {
-private:
-	string file;
-	ofstream fd;
-
-public:
-	ofile();
-	ofile(string filename , bool binary = false);
-	~ofile();
-	string name();
-	bool open(string filename, bool binary = false);
-	void writeString(string &);
-	void close();
-};
 
 bool fileexists(string fname);
 

@@ -6,6 +6,9 @@
 
 class geneticMap{
  public:
+#ifdef SHAPEIT
+  geneticMap(genhap_set & GH);
+#endif
   geneticMap(string fname);
   geneticMap();
   int interpolate(vector<int> & positions,vector<double> & output);

@@ -8,13 +8,11 @@ geneticMap::geneticMap(string fname){
     cM.push_back(4000. * 1.19);
     nsnp = 2;
   } else {
-    io::filtering_istream inf2;
-    ifstream blah(fname.c_str(),ios_base::in);
-    if(!blah) {
+    ifstream inf2(fname.c_str());
+    if(!inf2) {
       cerr << "Problem reading genetic map: " << fname << "\nExiting..."<<endl;
       exit(1);
     }
-    inf2.push(blah);
     int tmp1;
     double tmp2,tmp3;
     inf2.ignore(1000,'\n');
@@ -38,6 +36,18 @@ geneticMap::geneticMap(string fname){
   }
 }
 
+#ifdef SHAPEIT2
+geneticMap::geneticMap(genhap_set & GH) {
+  nsnp = GH.mapG->vec_pos.size();
+  pos.resize(nsnp);
+  cM.resize(nsnp);
+  for(int l=0;l<nsnp;l++) {
+    pos[l]=(GH.mapG->vec_pos[l]->bp);
+    cM[l]=(GH.mapG->vec_pos[l]->cm);
+  }
+}
+#endif
+
 geneticMap::geneticMap() {
   int maxpos = 1000000000;
   pos.push_back(0);
@@ -49,17 +59,15 @@ geneticMap::geneticMap() {
 
 double geneticMap::interpolate(int position) {
   int i=0;
-  while(pos[i]<position) {
-    //cout << i << " "  << pos[i] << " " << position << endl;
-    if(i>=pos.size()) {
-      cerr << "ERROR: marker position was outside the range of provided genetic map"<<endl;
-      cerr << "Is your map the appropriate chromosome and build?" << endl;
-      cout << pos[i] <<endl;
-      exit(1);
-    }
+  while(i<nsnp && pos[i]<=position) {
     i++;
   }
-  //cout << cM[i-1]  << " + " << "("<<cM[i]<<"-"<<cM[i-1]<<")*"<<"("<<position<<" - "<<pos[i-1]<<")/"<<"("<<pos[i]<<" - "<<pos[i-1]<<") )"<<endl;
+  if(i>=nsnp) {
+    i--;
+    cerr << "WARNING: marker at position "<<position<< " was outside the range of provided genetic map"<<endl;
+    cerr << "Is your map the appropriate chromosome and build?" << endl;
+  }
+
   return(  cM[i-1] + (cM[i]-cM[i-1])*(double)(position-pos[i-1])/(double)(pos[i]-pos[i-1]) );
 }
 

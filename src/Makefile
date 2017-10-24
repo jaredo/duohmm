@@ -9,7 +9,7 @@ IFLAGS =  -I$(BOOST_ROOT)/include
 
 VERSION := $(shell git describe  --always --tags)
 
-release: CFLAGS = -O2 $(IFLAGS)
+release: CFLAGS = -O2 $(IFLAGS) 
 release: duohmm
 
 debug: CFLAGS = -g -Wall $(IFLAGS)
