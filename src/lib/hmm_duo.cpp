@@ -1,24 +1,20 @@
 #include "hmm.h"
 
 geneticMap::geneticMap(string fname){
+  pos.push_back(0);
+  cM.push_back(0.0);    
   if(fname.compare("")==0) {
-    pos.push_back(0);
     pos.push_back(4000e6);
-    cM.push_back(0.0);
     cM.push_back(4000. * 1.19);
-    nsnp = 2;
   } else {
-    io::filtering_istream inf2;
-    ifstream blah(fname.c_str(),ios_base::in);
-    if(!blah) {
+    ifstream inf2(fname.c_str());
+    if(!inf2) {
       cerr << "Problem reading genetic map: " << fname << "\nExiting..."<<endl;
       exit(1);
     }
-    inf2.push(blah);
     int tmp1;
     double tmp2,tmp3;
     inf2.ignore(1000,'\n');
-    nsnp = 0;
     while(inf2) {
       inf2 >> tmp1;
       inf2 >> tmp2;
@@ -27,16 +23,27 @@ geneticMap::geneticMap(string fname){
       //      cout << tmp1 <<"\t" <<tmp2<<"\t"<<tmp3<<endl;
       pos.push_back(tmp1);
       cM.push_back(tmp3);
-      nsnp++;
     }
     float     maxpos = pos[pos.size()-1] + 5e6;
     float last_cm = cM[cM.size()-1] + 5*1.19;
-
     pos.push_back(maxpos);
     cM.push_back(last_cm);
     //    cout << maxpos << " " << last_cm<<endl;
   }
+  nsnp = pos.size();
 }
+
+#ifdef SHAPEIT
+geneticMap::geneticMap(genhap_set & GH) {
+  pos.push_back(0);
+  cM.push_back(0.0);
+  for(size_t l=0;l<GH.mapG->vec_pos.size();l++) {
+    pos.push_back(GH.mapG->vec_pos[l]->bp);
+    cM.push_back(GH.mapG->vec_pos[l]->cm);
+  }
+  nsnp = pos.size();
+}
+#endif
 
 geneticMap::geneticMap() {
   int maxpos = 1000000000;
@@ -49,25 +56,30 @@ geneticMap::geneticMap() {
 
 double geneticMap::interpolate(int position) {
   int i=0;
-  while(pos[i]<position) {
-    //cout << i << " "  << pos[i] << " " << position << endl;
-    if(i>=pos.size()) {
-      cerr << "ERROR: marker position was outside the range of provided genetic map"<<endl;
-      cerr << "Is your map the appropriate chromosome and build?" << endl;
-      cout << pos[i] <<endl;
-      exit(1);
-    }
+  while(i<nsnp && pos[i]<=position) {
     i++;
   }
-  //cout << cM[i-1]  << " + " << "("<<cM[i]<<"-"<<cM[i-1]<<")*"<<"("<<position<<" - "<<pos[i-1]<<")/"<<"("<<pos[i]<<" - "<<pos[i-1]<<") )"<<endl;
+  assert(i>0);
+  if(i>=nsnp) {
+    i--;
+#ifndef SHAPEIT
+    cerr << "WARNING: marker at position "<<position<< " was outside the range of provided genetic map"<<endl;
+    cerr << "Is your map the appropriate chromosome and build?" << endl;
+#endif
+  }
+
   return(  cM[i-1] + (cM[i]-cM[i-1])*(double)(position-pos[i-1])/(double)(pos[i]-pos[i-1]) );
 }
 
 int geneticMap::interpolate(vector<int> & positions,vector<double> & output){
   output.resize(positions.size());
 
-  for(int i=0;i<positions.size();i++) 
+  for(size_t i=0;i<positions.size();i++) {
     output[i] = interpolate(positions[i]);
+// #ifdef DEBUG
+//     cerr<<positions[i]<<"\t"<<output[i]<<endl;
+// #endif
+  }
 
   return(0);
 }
@@ -95,9 +107,6 @@ DuoHMM::DuoHMM(vector<int> & positions, geneticMap & gm)
   female_norho.resize(nsnp);
 
   for(int i=0;i<nsnp-1;i++) {
-    if(DEBUG>1)
-      if(i>55900 & i< 56000100)
-	cout << i << " " << positions[i] << " " << cM[i]<<endl;
 
     r = (cM[i+1]-cM[i])/100.;
     if(r<=0.0) r = 1e-13;//hack to handle positions with same genetic location (which shouldnt be in the snps in the first place)
@@ -234,7 +243,8 @@ int DuoHMM::backward() {
   return(0);
 }
 
-int DuoHMM::setHaps(unsigned char **parental_haplotypes,unsigned char **child_haplotypes,string sex) { 
+int DuoHMM::setHaps(unsigned char **parental_haplotypes,unsigned char **child_haplotypes,string sex) {
+  assert(parental_haplotypes!=nullptr && child_haplotypes!=nullptr);
   //  cout << sex << endl;
   assert(sex.compare("1")==0 || sex.compare("2")==0);
   parent = parental_haplotypes;

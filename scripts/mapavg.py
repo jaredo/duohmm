@@ -23,8 +23,9 @@ for i,f in enumerate(files):
     pos = fin.next().split()[2:]
 
     for row in fin:
-        child,parent = row[:1000].split()[:2]
-        p = [float(val) for val in row.split()[2:]]
+        row = row.split()
+        child,parent = row[:2]
+        p = [float(val) for val in row[2:]]
         if i==0:
             recmap[(child,parent)] = p   
             nsnp = len(p)

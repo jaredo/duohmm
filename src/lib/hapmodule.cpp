@@ -7,7 +7,16 @@ Haplotypes::Haplotypes(const Haplotypes& h) {
   nsnp = h.nsnp;
 
   H = newMatrix<unsigned char>(nhap,nsnp);
-  for(int i=0;i<nhap;i++) memcpy(H[i],h.H[i],nsnp);
+  for(int i=0;i<nhap;i++) std::memcpy(H[i],h.H[i],nsnp);
+}
+
+Haplotypes::~Haplotypes() {
+  delMatrix<unsigned char>(H,nhap);
+}
+
+unsigned char **Haplotypes::getHap(string id){
+  assert(idlook.count(id));
+  return(&H[idlook[id]*2]);
 }
 
 
@@ -21,7 +30,6 @@ Haplotypes::Haplotypes(string filename) {
     
   string line;
   int pos;
-  char c;
   int count = 0;
   //int *positions;
   ids.clear();
@@ -41,16 +49,13 @@ Haplotypes::Haplotypes(string filename) {
   allsamples.resize(nhap);
   for(int i=0;i<nhap;i++) allsamples[i] = i;
   inf1.close();
-  io::filtering_istream inf2;
   //ifstream blah((filename+".haps").c_str(),ios_base::in | ios_base::binary);
-  ifstream blah((filename+".haps").c_str(),ios_base::in);
-  if(!blah) {
+  ifstream inf2((filename+".haps").c_str());
+  if(!inf2) {
     cerr << "Problem reading "<< filename+".haps" << endl;
     exit(1);
   }
 
-  //inf2.push(io::gzip_decompressor());
-  inf2.push(blah);
   count = 0;
   while ( getline(inf2,line) ) {
     count ++;
@@ -63,10 +68,8 @@ Haplotypes::Haplotypes(string filename) {
   ref.resize(nsnp);
   alt.resize(nsnp);
 
-  blah.seekg(0);
-  blah.clear();
-  inf2.pop();
-  inf2.push(blah);
+  inf2.close();
+  inf2.open((filename+".haps").c_str());
 
   H = newMatrix<unsigned char>(nhap,nsnp);
   string tmp;
@@ -136,13 +139,89 @@ int Haplotypes::writeHaps(string fname) {
   return(0);
 }
 
+#ifdef SHAPEIT
+//these routines deals specifically with converting to/from SHAPEIT2 data structures
 
-Haplotypes::~Haplotypes() {
-  delMatrix<unsigned char>(H,nhap,nsnp);
+Haplotypes::Haplotypes(filter_writer & F, genhap_set & GH){//builds haps from a S2 genhaptset
+  //haplotype_writer::haplotype_writer(filter_writer & _F, genhap_set & _GH, string header1, string header2, bool founder) : F(_F), GH(_GH) {
+
+  //INTERNAL DATA
+
+  nhap = GH.vecG.size() * 2;
+  nsnp = GH.mapG->size();
+  if(DEBUG>0)  cout << nhap << " haps and "<< nsnp << " snps" << endl;
+  //this bit orders the data...i think
+  for (int i=0 ;i<GH.vecG.size();i++) {
+    genotype_graph * g = GH.vecG[i];
+    int type = g->type;
+    assert(!(type == DUO_F || type == TRIO_F)  && !(type == DUO_M || type == TRIO_M));
+    if (F.checkInd(g->name)) orderI.push_back(haplotype_index(g->index, i, UNR));
+  }
+
+
+  assert(orderI.size()==nhap/2);
+  //now we label the samples
+  ids.resize(nhap/2);
+  for (int i = 0 ; i < orderI.size() ; i ++) {
+    genotype_graph * g = GH.vecG[orderI[i].indexG];
+    int type = orderI[i].type;
+    string name;
+    if (type == DUO_F || type == TRIO_F) {
+      name = g->fname;
+    } else if (type == DUO_M || type == TRIO_M) {
+      name =  g->mname;
+    } else {
+      name =  g->name;
+    }
+    ids[i] = name;
+    idlook[name]=i;
+  }
+
+  H = newMatrix<unsigned char>(nhap,nsnp);
+  positions.resize(nsnp);
+  ref.assign(nsnp,"A");
+  alt.assign(nsnp,"A");
+  rsid1.resize(nsnp,"-");
+  rsid2.resize(nsnp,"-");
+
+   //now we convert the haplotypes.
+  for (int l = 0 ; l < GH.mapG->size() ; l ++) {
+    snp * s = GH.mapG->vec_pos[l];
+    if (F.checkSnp(s->bp)) {
+      positions[l]=s->bp;
+      for (int i = 0 ; i < orderI.size() ; i ++) {
+	int type = orderI[i].type;
+	unsigned int a1,a2;
+	assert(!(type == DUO_F || type == TRIO_F)  && !(type == DUO_M || type == TRIO_M));
+
+	a1 = GH.vecH[GH.G2H[orderI[i].indexG][0]][l];
+	a2 = GH.vecH[GH.G2H[orderI[i].indexG][1]][l];
+
+	H[i*2][l]=a1;
+	H[i*2+1][l]=a2;
+      }
+    }
+  }
+  allsamples.resize(nhap/2);
+  for(int i=0;i<nhap/2;i++) allsamples[i] = i;
+  if(DEBUG>0)  cout << "finished reading haps "<<endl;
 }
 
-unsigned char **Haplotypes::getHap(string id){
-  assert(idlook.count(id));
-  return(&H[idlook[id]*2]);
+
+int Haplotypes::getSHAPEIT2(filter_writer & F, genhap_set & GH){//puts haplotypes back  into GH for S2
+  for (int l = 0 ; l < GH.mapG->size() ; l ++) {
+    snp * s = GH.mapG->vec_pos[l];
+    if (F.checkSnp(s->bp)) {
+      positions[l]=s->bp;
+      for (int i = 0 ; i < orderI.size() ; i ++) {
+	int type = orderI[i].type;
+	assert(!(type == DUO_F || type == TRIO_F)  && !(type == DUO_M || type == TRIO_M));
+        GH.vecH[GH.G2H[orderI[i].indexG][0]].set(l,H[i*2][l]);
+	GH.vecH[GH.G2H[orderI[i].indexG][1]].set(l,H[i*2+1][l]);
+      }
+    }
+  }
+  return(0);
 }
 
+#endif

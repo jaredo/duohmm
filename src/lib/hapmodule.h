@@ -7,7 +7,17 @@
 #include <string>
 #include <map>
 #include "utilityfunc.h"
+#include <cstring>
 
+#ifdef SHAPEIT
+#include <duohmm/utilityfunc.h>
+#include <containers/genhap_set.h>
+#include <output/haplotype_writer.h>
+
+//S2 headers
+#include <output/filter_writer.h>
+#include <containers/genhap_set.h>
+#endif
 
 using namespace std;
 
@@ -27,5 +37,11 @@ class Haplotypes {
   int nsnp,nhap,K,min_canopy_size,max_canopy_size;
   unsigned char **H;  // haps raw/compressed
   vector<int> allsamples;
+#ifdef SHAPEIT
+  Haplotypes(filter_writer & F, genhap_set & GH);
+  int getSHAPEIT2(filter_writer & F, genhap_set & GH);
+  vector < haplotype_index > orderI;
+#endif
 
 };
+

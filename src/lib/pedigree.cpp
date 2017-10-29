@@ -10,9 +10,7 @@ pedigree::pedigree(string fname,vector<string> & ids,char type) {
 }
 
 int pedigree::fromSample(string fname,vector<string> & ids) {
-  io::filtering_istream inf2;
-  ifstream blah(fname.c_str(),ios_base::in);
-  inf2.push(blah);
+  ifstream inf2(fname.c_str());
   set<string> idcheck(ids.begin(),ids.end());
   string fid,id,dad,mum,sex;
   int count = 0;
@@ -93,16 +91,14 @@ int pedigree::fromSample(string fname,vector<string> & ids) {
   }
   cout << count << " samples in " << fname << endl;
   buildPeds();
-  delete header;
+  delete[] header;
   return 0;
 }
 
 
 
 int pedigree::fromFam(string fname,vector<string> & ids) {
-  io::filtering_istream inf2;
-  ifstream blah(fname.c_str(),ios_base::in);
-  inf2.push(blah);
+  ifstream inf2(fname.c_str());
   set<string> idcheck(ids.begin(),ids.end());
   string fid,id,dad,mum,sex;
   int count = 0;
@@ -181,7 +177,6 @@ int pedigree::buildPeds() {
     }
   }
 
-  cout << pedigrees.size() << " distinct pedigrees found."<<endl;
   map<int,int> freq;
   for (vector<set<string> >::iterator it2=pedigrees.begin(); it2!=pedigrees.end(); it2++) {
     int n = it2->size();
@@ -198,10 +193,12 @@ int pedigree::buildPeds() {
 
   }
 
+#ifndef SHAPEIT
+  cout << pedigrees.size() << " distinct pedigrees found."<<endl;
   cout << "SIZE\tFREQUENCY"<<endl;
   for (map<int,int>::iterator it2=freq.begin(); it2!=freq.end(); it2++)
     cout << it2->first << "\t" << it2->second << endl;
-
+#endif
 
   return(0);
 }
@@ -228,3 +225,91 @@ int pedigree::orderSamples(set<string> & ids,vector<string> & ordered_ids) {
   return(0);
 }
 
+#ifdef SHAPEIT
+
+pedigree::pedigree(filter_writer & F, genhap_set & GH, string header1, string header2,vector<string> & ids) {
+  if(DEBUG>0) cout << header1<<endl<<header2<<endl;
+  istringstream iss(header1);
+  string field;
+  int count = 0;
+  set<string> idcheck(ids.begin(),ids.end());
+  int dadidx=-1,mumidx=-1,sexidx=-1;
+  while(iss) {
+    iss >> field;
+    if(!iss)
+      break;
+    if(field.compare("father")==0||field.compare("ID_father")==0)
+      dadidx=count;
+    if(field.compare("mother")==0||field.compare("ID_mother")==0)
+      mumidx=count;
+    if(field.compare("sex")==0||field.compare("gender")==0)      
+      sexidx=count;
+    count++;
+  }
+  dadidx--;
+  mumidx--;
+  sexidx--;
+
+  if(DEBUG>0) cout << dadidx << " " << mumidx << " " << sexidx << endl;
+  count = 0;
+  bool sex_warn=false;
+  for (int i = 0 ; i < GH.vecG.size(); i ++) {
+    genotype_graph * g = GH.vecG[i];
+    int type = g->type;
+    assert(!(type == DUO_F || type == TRIO_F)  && !(type == DUO_M || type == TRIO_M));
+    /*
+    if (type == DUO_F || type == TRIO_F) {
+      if(DEBUG>0) cout  << g->fproperties[0] << " " << g->fname;
+      for (int p = 1 ; p < g->fproperties.size() ; p ++) if(DEBUG>0) cout  << " " << g->fproperties[p];
+      if(DEBUG>0) cout  << endl;
+    } else if (type == DUO_M || type == TRIO_M) {
+      if(DEBUG>0) cout  << g->mproperties[0] << " " << g->mname;
+      for (int p = 1 ; p < g->mproperties.size() ; p ++) if(DEBUG>0) cout  << " " << g->mproperties[p];
+      if(DEBUG>0) cout  << endl;
+    } else {
+      if(DEBUG>0) cout  << g->properties[0] << " " << g->name;
+      for (int p = 1 ; p < g->properties.size() ; p ++) if(DEBUG>0) cout  << " " << g->properties[p];
+      if(DEBUG>0) cout  << endl;
+    }
+    */
+    if(!(dadidx < g->properties.size() && dadidx>=0)) {
+      cerr <<"ERROR: duohmm module could not find father id column"<<endl;
+      exit(1);
+    }
+    if(!(mumidx < g->properties.size() && mumidx>=0)) {
+      cerr <<"ERROR: duohmm module could not find mother id column"<<endl;
+      exit(1);      
+    }
+    if(!sex_warn && !(sexidx < (int)g->properties.size() && sexidx>=0))  {
+      cerr << "WARNING: sample sex was not provided"<<endl;
+      sex_warn=true;
+    }
+    
+    individual tmp;
+    tmp.fid = g->properties[0];
+    tmp.id =  g->name;
+    tmp.dad = g->properties[dadidx];
+    tmp.mum = g->properties[mumidx];
+    if(sexidx>=0)
+      tmp.sex = g->properties[sexidx];
+    else
+      tmp.sex="unknown";
+
+    if(DEBUG>0)
+      cout << tmp.fid << " " << tmp.id << " " << tmp.dad << " " <<tmp.mum << " " <<tmp.sex<<endl;
+
+    assert(tmp.id.compare("0")!=0);
+
+    if(idcheck.count(tmp.dad)==0) tmp.dad = "0";
+    if(idcheck.count(tmp.mum)==0) tmp.mum = "0";
+
+    tmp.idx = count;
+    tmp.fidx = -1;
+    count++;
+    if(idcheck.count(tmp.id)>0) sampleinfo[tmp.id] = tmp;
+  }
+  if(DEBUG>0) cout << count << " samples" << endl;
+  buildPeds();
+}
+
+#endif

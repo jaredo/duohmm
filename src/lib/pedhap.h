@@ -3,11 +3,23 @@
 #include "pedigree.h"
 #include "hmm.h"
 
+#ifndef SHAPEIT
+#define VERBOSE 1
+#endif
+
+#ifdef SHAPEIT
+#include <globals.h>
+#define VERBOSE 0
+#endif
 
 class pedhap {
  public:
   pedhap(string hap_filename,string pedigree_filename,string gm_filename);
   pedhap(string hap_filename,string gm_filename,int niteration=100);
+  ~pedhap();
+#ifdef SHAPEIT
+  pedhap(filter_writer & F, genhap_set & GH,string header1,string header2,int niteration=100);
+#endif
   //  pedhap(string hap_filename,string pedigree_filename);
 
 

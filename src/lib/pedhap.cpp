@@ -16,6 +16,21 @@ int unswitch(unsigned char **h,int start,int stop) {
   return(0);
 }
 
+
+#ifdef SHAPEIT
+pedhap::pedhap(filter_writer & F,genhap_set & GH,string header1,string header2,int niteration) {
+  NITERATION=niteration;
+  if(VERBOSE) cout << "converting haps" <<endl;
+  haps =  new Haplotypes(F,GH);
+  ped = new  pedigree(F,GH, header1, header2,haps->ids);
+  if(VERBOSE) cout << "reading genetic map." <<endl;
+  gm = new geneticMap(GH);
+  duo =  new DuoHMM(haps->positions,*gm);
+  trio =  new TrioHMM(haps->positions,*gm);
+  nsnp = haps->positions.size();  
+}
+#endif
+
 //constructor
 pedhap::pedhap(string hap_filename,string pedigree_filename,string gm_filename) {
   haps =  new Haplotypes(hap_filename);
@@ -39,6 +54,14 @@ pedhap::pedhap(string hap_filename,string gm_filename,int niteration) {
   NITERATION=niteration;
 }
 
+pedhap::~pedhap()
+{
+  delete haps;
+  delete ped;
+  delete gm;
+  delete duo;
+  delete trio;
+}
 /*
 pedhap::pedhap(string hap_filename,string pedigree_filename) {
   haps =  new Haplotypes(hap_filename);
@@ -55,9 +78,11 @@ int pedhap::phase(string child) {
   assert(ped->sampleinfo.count(child));
   string dad = ped->sampleinfo[child].dad;
   string mum = ped->sampleinfo[child].mum;
-  cout << "Phasing " << child << " - " << dad << " - " << mum << endl;
+  if(VERBOSE>0)    {
+    cout << "Phasing " << child << " - " << dad << " - " << mum << endl;
+  }
   assert(ped->sampleinfo.count(dad)  ||  ped->sampleinfo.count(mum));
-  unsigned char **d,**m,**p;
+  unsigned char **d=nullptr,**m=nullptr,**p=nullptr;
   unsigned char **c = haps->getHap(child);
   pair<string,string> key,key1,key2;
   if(dad.compare("0")!=0 && mum.compare("0")!=0) {
@@ -177,29 +202,44 @@ int pedhap::minRecombinant(string parent) {
 }
 
 int pedhap::correct() {
+  int num_phaseable=0,num_phased=0;
 
+  //this just counts how many meioses we are going to phasew
+#ifdef SHAPEIT
   for(vector< set<string> >::iterator it1=ped->pedigrees.begin(); it1!=ped->pedigrees.end(); it1++) {
-
+    vector<string> idorder;
+    ped->orderSamples(*it1,idorder);    
+    for(vector<string>::iterator it2=idorder.begin();it2!=idorder.end();it2++) {
+      string dad = ped->sampleinfo[*it2].dad;
+      string mum = ped->sampleinfo[*it2].mum;      
+      if(dad.compare("0")!=0 || mum.compare("0")!=0)  {
+	num_phaseable++;
+      }
+    }
+  }
+  cout << "\nCorrecting haplotypes based on pedigree structure ["<<num_phased<<"/"<<num_phaseable<< "]\r";
+#endif
+  
+  //this does the phasing
+  for(vector< set<string> >::iterator it1=ped->pedigrees.begin(); it1!=ped->pedigrees.end(); it1++) {
     vector<string> idorder;
     ped->orderSamples(*it1,idorder);
-
     for(vector<string>::iterator it2=idorder.begin();it2!=idorder.end();it2++) {
       string dad = ped->sampleinfo[*it2].dad;
       string mum = ped->sampleinfo[*it2].mum;
-      if(dad.compare("0")!=0 || mum.compare("0")!=0)  
+      if(dad.compare("0")!=0 || mum.compare("0")!=0)  {
+	num_phased++;
 	phase(*it2);
-      /*
-	if(dad.compare("0")!=0)  
-	phase(dad,*it2);
-	if(mum.compare("0")!=0)  
-	phase(mum,*it2);
-      */
+#ifdef SHAPEIT
+	cout << "Correcting haplotypes based on pedigree structure ["<<num_phased<<"/"<<num_phaseable<< "]\r";
+#endif
+      }
     }
-
-    for(vector<string>::iterator it2=idorder.begin();it2!=idorder.end();it2++) 
+    for(vector<string>::iterator it2=idorder.begin();it2!=idorder.end();it2++)  {
       minRecombinant(*it2);
-
+    }
   }
+  cout<<endl;
 
   return(0);
 }
