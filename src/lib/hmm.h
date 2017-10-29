@@ -93,6 +93,8 @@ class TrioHMM {
   int forward();
   int backward();
   int estimateRecombination();
+  int estimateRecombinationDad();
+  int estimateRecombinationMum();
   vector < vector<double> > posterior;
   vector < vector< vector<double> > > trans_posterior;
 
