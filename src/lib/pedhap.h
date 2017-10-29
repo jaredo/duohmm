@@ -28,7 +28,7 @@ class pedhap {
   int minRecombinant(string parent);
   int genotypingError(string outfile);
   int recombinationMap(string outfile);
-
+  int imputeMissing();
   int nsnp,NITERATION;
   map< pair<string,string>, vector<unsigned char> > stateseq;
 

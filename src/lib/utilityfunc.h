@@ -74,3 +74,5 @@ void printMatrix(T **H,int nrow,int ncol) {
 bool fileexists(string fname);
 
 int argmax(vector<double> & x);
+
+bool is_mendel_consistent(int k,int d,int m);

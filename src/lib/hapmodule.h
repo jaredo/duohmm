@@ -37,10 +37,16 @@ class Haplotypes {
   int nsnp,nhap,K,min_canopy_size,max_canopy_size;
   unsigned char **H;  // haps raw/compressed
   vector<int> allsamples;
+  bool isMissing(string & id,int index);
+  vector<bool> *getMissing(string & id);
+  
 #ifdef SHAPEIT
   Haplotypes(filter_writer & F, genhap_set & GH);
   int getSHAPEIT2(filter_writer & F, genhap_set & GH);
   vector < haplotype_index > orderI;
+  filter_writer * _F;
+  genhap_set * _GH;
+  vector < vector<bool> > _missing;
 #endif
 
 };

@@ -49,3 +49,23 @@ bool fileexists(string fname){
   ifstream ifile(fname.c_str());
   return ifile.is_open();
 }
+
+bool is_mendel_consistent(int k,int d,int m)
+{
+    if(m==0&&d==0)
+    {
+	if(k==0) return(true);
+    }
+    if((m==0&&d==1)||(m==1&&d==0))
+	if(k!=2) return(true);
+    if((m==0&&d==2)||(m==2&&d==0))
+	if(k==1) return(true);
+    if(m==1&&d==1)
+	return(true);
+    if((m==1&&d==2)||(m==2&&d==1))
+	if(k!=0) return(true);      
+    if(m==2&&d==2)
+	if(k==2) return(true);
+
+    return(false);
+}
