@@ -57,19 +57,6 @@ int main(int argc,char **argv) {
       cout << "No haplotypes file provided.\nExiting..." << endl;
       return(1);
     }
-    /*
-    if (vm.count("fam")) {
-      if(!fileexists(fam)) {
-	cerr << fam << " does not exist!\nExiting...."<<endl;
-	return(1);
-      } else
-	cout << "Pedigree file:\t" << fam << "\n";
-    }
-    else {
-      cout << "No pedigree information provided.\nExiting..." << endl;
-      return(1);
-    }
-    */
     if( !(vm.count("output-hap") || vm.count("output-generr") || vm.count("output-rec")))  {
       cout << "You must specify one of: --output-hap --output-generr --output-rec\nExiting..."<<endl;
       return 1;
