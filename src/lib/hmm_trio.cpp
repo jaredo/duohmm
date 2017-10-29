@@ -554,11 +554,18 @@ int TrioHMM::viterbi() {
 }
 
 
-int TrioHMM::estimateRecombination() {
+int TrioHMM::estimateRecombination()
+{
     recombinationPat.assign(nsnp,0.0);
     recombinationMat.assign(nsnp,0.0);
     EM(NITERATION);
-    double r,rho_mum,rho_dad;
+    estimateRecombinationDad();
+    estimateRecombinationMum();
+    return 0;
+}
+
+int TrioHMM::estimateRecombinationDad() {
+    double r,rho_dad;
     double noerror = 1. - error;
     int prevhet=-1;
     int l=0;
@@ -577,7 +584,6 @@ int TrioHMM::estimateRecombination() {
 
 	    rho_dad = 1 - exp(-male_multiplier*r);
 	    //      rho_dad = 0.5;
-	    rho_mum = 1 - exp(-female_multiplier*r);
 	    recp = 0.0;
 	    double denominator=0;//recombination probability
 
@@ -598,11 +604,11 @@ int TrioHMM::estimateRecombination() {
 					kdad = 1;
 					kmum = 0;	  
 				    }
-
+				    p1 = alpha[idx1][prevhet]*beta[idx2][l];
 				    if(child[kdad][l]==dad[i2][l] && child[kmum][l]==mum[j2][l])
-					p1 = alpha[idx1][prevhet]*beta[idx2][l]*noerror;
+					p1*=noerror;
 				    else 
-					p1 = alpha[idx1][prevhet]*beta[idx2][l]*error;
+					p1*=error;
 
 				    p2 = p1;
 
@@ -641,7 +647,17 @@ int TrioHMM::estimateRecombination() {
 	for(int i=prevhet;i<l;i++) recombinationPat[i] = recp;
 	prevhet = l;
     }
-    l=0;
+    return 0;
+}
+
+int TrioHMM::estimateRecombinationMum() {
+    double r,rho_mum;
+    double noerror = 1. - error;
+    int prevhet=-1;
+    int l=0;
+    double p1,p2,recp;
+    int kdad,kmum;
+
     while(mum[0][l]==mum[1][l]) l++;
     prevhet=l;
   
@@ -652,8 +668,6 @@ int TrioHMM::estimateRecombination() {
 
 	    r =  (cM[l]-cM[prevhet])/100.;    
 	    if(r<=0.0) r = 1e-13;//hack to handle positions with same genetic location (which shouldnt be in the snps in the first place)
-	    rho_dad = 1 - exp(-male_multiplier*r);
-	    //      rho_dad = 0.5;
 	    rho_mum = 1 - exp(-female_multiplier*r);
 	    recp = 0.0;
 	    double denominator=0;//recombination probability
