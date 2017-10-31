@@ -1,3 +1,5 @@
+//$Id$
+
 #include "hapmodule.h"
 
 #define DEBUG 0

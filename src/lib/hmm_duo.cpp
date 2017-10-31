@@ -1,3 +1,5 @@
+//$Id$
+
 #include "hmm.h"
 
 geneticMap::geneticMap(string fname){

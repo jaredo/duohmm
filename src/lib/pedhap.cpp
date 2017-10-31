@@ -1,3 +1,5 @@
+//$Id$
+
 #include "pedhap.h"
 
 int unswitch(unsigned char **h,int start,int stop) {
@@ -30,34 +32,6 @@ pedhap::pedhap(filter_writer & F,genhap_set & GH,string header1,string header2,i
   nsnp = haps->positions.size();  
 }
 
-//performs some simple post-hoc imputation for individuals with missing genotypes
-// int pedhap::imputeMissing()
-// {
-//   for(vector< set<string> >::iterator it1=ped->pedigrees.begin(); it1!=ped->pedigrees.end(); it1++)
-//   {
-//       vector<string> idorder;
-//       ped->orderSamples(*it1,idorder);
-//       for(vector<string>::iterator it2=idorder.begin();it2!=idorder.end();it2++)
-//       {
-// 	  string dad = ped->sampleinfo[*it2].dad;
-// 	  string mum = ped->sampleinfo[*it2].mum;
-// 	  if(dad.compare("0")!=0 || mum.compare("0")!=0)
-// 	  {
-// 	      for(int l=0;l<nsnp;l++)
-// 	      {
-// 		  if(haps->isMissing(*it2,l))
-// 		  {
-// #ifdef DEBUG
-// 		      cerr << *it2 << " " << l << endl;
-// #endif
-		      
-// 		  }
-// 	      }
-// 	  }
-//       }
-//   }
-//   return 0;
-// }
 #endif
 
 //constructor
@@ -259,17 +233,6 @@ int pedhap::minRecombinant(string parent) {
   unsigned char **p = haps->getHap(parent);
   set<string> kids = ped->sampleinfo[parent].kids;
   int prevhet=-1;
-
-  /*
-    for(set<string>::iterator it1=kids.begin();it1!=kids.end();it1++) {
-    unsigned char **c = haps->getHap(*it1);
-    duo->setHaps(p,c,ped->sampleinfo[parent].sex);  
-    duo->EM(NITERATION);
-    duo->viterbi();
-    pair<string,string> key(parent,*it1);
-    stateseq[key] = duo->stateseq;
-    }
-  */
 
   for(int l=0;l<nsnp;l++) {
     if(p[0][l]!=p[1][l]){

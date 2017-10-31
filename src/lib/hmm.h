@@ -1,3 +1,5 @@
+//$Id$
+
 #pragma once
 #include "hapmodule.h"
 #include "utilityfunc.h"
