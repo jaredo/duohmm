@@ -155,39 +155,40 @@ int pedhap::phase(string child) {
 	  bitset<3> b(s);
 	  int mum_src = b[1];	  
 	  int dad_src = b[2];
-	  if(!is_mendel_consistent(c[0][l]+c[1][l],d[0][l]+d[1][l],m[0][l]+m[1][l]))
+
+	  //always impute a missing child directly from parents
+	  if((*kid_missing)[l])
 	  {
-	      if((*kid_missing)[l])
-	      {
-		  c[b[0]][l] = d[dad_src][l];
-		  c[(b[0]+1)%2][l] = m[mum_src][l];
+	      c[b[0]][l] = d[dad_src][l];
+	      c[(b[0]+1)%2][l] = m[mum_src][l];
 //	      assert(is_mendel_consistent(c[0][l]+c[1][l],d[0][l]+d[1][l],m[0][l]+m[1][l]));//debug	      
 //	      debugging	      
 //	      std::cerr << "MISSING KID "<< child <<" "<<dad<<" "<<mum<<" "<<haps->positions[l]<<" "<<(int)trio->stateseq[l]<<" "<<b[0]<<b[1]<<b[2];
 //	      std::cerr<<" "<<(int)c[0][l]<<" "<<(int)c[1][l]<<" "<<(int)m[0][l]<<" "<<(int)m[1][l]<<" "<<(int)d[0][l]<<" "<<(int)d[1][l]<<endl;
-	      }
-	      else 
+	  }
+	  
+	  //if there is mendel inconsistency. impute missing parents from child
+	  if(!is_mendel_consistent(c[0][l]+c[1][l],d[0][l]+d[1][l],m[0][l]+m[1][l]))
+	  {
+	      if((*dad_missing)[l] && (*mum_missing)[l])
 	      {
-		  if((*dad_missing)[l] && (*mum_missing)[l])
+		  d[dad_src][l]=c[b[0]][l];
+		  m[mum_src][l] = c[(b[0]+1)%2][l];	      
+	      }
+	      else if((*dad_missing)[l])
+	      {
+		  d[dad_src][l]=c[b[0]][l];
+		  if(!is_mendel_consistent(c[0][l]+c[1][l],d[0][l]+d[1][l],m[0][l]+m[1][l]))
 		  {
-		      d[dad_src][l]=c[b[0]][l];
-		      m[mum_src][l] = c[(b[0]+1)%2][l];	      
+		      d[dad_src][l] = (d[dad_src][l]+1)%2;
 		  }
-		  else if((*dad_missing)[l])
+	      }
+	      else if((*mum_missing)[l])
+	      {
+		  m[mum_src][l] = c[(b[0]+1)%2][l];
+		  if(!is_mendel_consistent(c[0][l]+c[1][l],d[0][l]+d[1][l],m[0][l]+m[1][l]))
 		  {
-		      d[dad_src][l]=c[b[0]][l];
-		      if(!is_mendel_consistent(c[0][l]+c[1][l],d[0][l]+d[1][l],m[0][l]+m[1][l]))
-		      {
-			  d[dad_src][l] = (d[dad_src][l]+1)%2;
-		      }
-		  }
-		  else if((*mum_missing)[l])
-		  {
-		      m[mum_src][l] = c[(b[0]+1)%2][l];
-		      if(!is_mendel_consistent(c[0][l]+c[1][l],d[0][l]+d[1][l],m[0][l]+m[1][l]))
-		      {
-			  m[mum_src][l] = (m[mum_src][l]+1)%2;
-		      }
+		      m[mum_src][l] = (m[mum_src][l]+1)%2;
 		  }
 	      }
 	  }
