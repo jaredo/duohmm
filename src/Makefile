@@ -6,14 +6,14 @@ CXX = g++
 LFLAGS = -L$(BOOST_ROOT)/lib -lz -lboost_iostreams  -lboost_program_options
 #LFLAGS = -lz $(BOOST_ROOT)/lib/libboost_iostreams.a $(BOOST_ROOT)/lib/libboost_program_options.a
 IFLAGS =  -I$(BOOST_ROOT)/include
-CFLAGS = -O3 $(IFLAGS) -Wall
+CFLAGS = -O3 $(IFLAGS) -Wall -std=c++11 
 
 VERSION := $(shell git describe  --always --tags)
 
 HFILE= $(shell find lib/ -name *.h)
 
 all: duohmm 
-debug: CFLAGS = -g -Wall $(IFLAGS) 
+debug: CFLAGS = -g -Wall $(IFLAGS) -std=c++11 
 debug: all
 
 OBJS=obj/pedhap.o obj/hapmodule.o obj/utilityfunc.o obj/pedigree.o obj/hmm_duo.o obj/hmm_trio.o  

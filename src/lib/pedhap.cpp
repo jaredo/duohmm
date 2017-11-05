@@ -80,6 +80,10 @@ int pedhap::phase(string child) {
   vector<bool> *dad_missing = haps->getMissing(dad);
   vector<bool> *mum_missing = haps->getMissing(mum);
   vector<bool> *parent_missing =nullptr;
+  if(mum.compare("0")!=0) 
+      parent_missing = mum_missing;
+  if(dad.compare("0")!=0) 
+      parent_missing = dad_missing;
 #endif
   unsigned char **d=nullptr,**m=nullptr,**p=nullptr;
   unsigned char **c = haps->getHap(child);
@@ -106,13 +110,11 @@ int pedhap::phase(string child) {
   } 
   else {//duos
     if(dad.compare("0")!=0) {
-	parent_missing = dad_missing;
 	p = haps->getHap(dad);  
       duo->setHaps(p,c,"1");
       key = make_pair(dad,child);
     }
     if(mum.compare("0")!=0) {
-	parent_missing = mum_missing;
       p = haps->getHap(mum);  
       duo->setHaps(p,c,"2");
       key = make_pair(mum,child);
