@@ -330,7 +330,7 @@ int pedhap::genotypingError(string outfile) {
 	trio->setHaps(d,m,c);
 	trio->EM(NITERATION);
 	for(int l=0;l<nsnp;l++) {
-	  double p = trio->genError[l];
+	  float p = trio->genError[l];
 	  if(p>0.1) {
 	    outf << *it2 << "\t" << dad << "\t" << mum;
 	    outf << "\t"<< haps->rsid1[l]<< "\t"  << haps->positions[l];
@@ -345,7 +345,7 @@ int pedhap::genotypingError(string outfile) {
 	duo->setHaps(d,c,"1");
 	duo->EM(NITERATION);
 	for(int l=0;l<nsnp;l++) {
-	  double p = duo->genError[l];
+	  float p = duo->genError[l];
 	  if(p>0.1) {
 	    outf << *it2 << "\t" << dad << "\t" << mum;
 	    outf << "\t"<< haps->rsid1[l]<< "\t" << haps->positions[l];
@@ -359,7 +359,7 @@ int pedhap::genotypingError(string outfile) {
 	duo->setHaps(m,c,"2");
 	duo->EM(NITERATION);
 	for(int l=0;l<nsnp;l++) {
-	  double p = duo->genError[l];
+	  float p = duo->genError[l];
 	  if(p>0.1) {
 	    outf << *it2 << "\t" << dad << "\t" << mum;
 	    outf << "\t" << haps->rsid1[l]<< "\t" << haps->positions[l];

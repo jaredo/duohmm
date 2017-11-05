@@ -3,7 +3,7 @@
 #include "utilityfunc.h"
 
 
-int argmax(vector<double> & x) {
+int argmax(vector<float> & x) {
   int maxind=0;
   for(size_t i=1;i<x.size();i++) 
     if(x[i]>x[maxind]) maxind=i;

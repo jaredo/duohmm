@@ -4,7 +4,7 @@
 
 TrioHMM::TrioHMM(vector<int> & positions, geneticMap & gm)
 {
-    double r;
+    float r;
     NITERATION=100;
     K=8;
     male_multiplier = 0.7539868;
@@ -32,24 +32,28 @@ TrioHMM::TrioHMM(vector<int> & positions, geneticMap & gm)
 	female_rho[i] = 1. - female_norho[i];
     }
 
+    stateseq.resize(nsnp);
     scale.resize(nsnp);
-    alpha.resize(K);
-    beta.resize(K);
-    posterior.resize(K);
-    trans_posterior.resize(K);
 
+    alpha.assign(K,vector<float>(nsnp));
+    beta.assign(K,vector<float>(nsnp));
+    posterior.assign(K,vector<float>(nsnp));
+    // alpha.resize(K);
+    // beta.resize(K);
+    // posterior.resize(K);
+    // for(int i=0;i<K;i++) {
+    // 	alpha[i].resize(nsnp);
+    // 	beta[i].resize(nsnp);
+    // 	posterior[i].resize(nsnp);
+    // }
+
+    
+    trans_posterior.resize(K);
     for(int i=0;i<K;i++)  {
 	trans_posterior[i].resize(K);
 	for(int j=0;j<K;j++) 
 	    trans_posterior[i][j].resize(nsnp,0.0);
-    }
-
-    for(int i=0;i<K;i++) {
-	alpha[i].resize(nsnp);
-	beta[i].resize(nsnp);
-	posterior[i].resize(nsnp);
-    }
-    stateseq.resize(nsnp);
+    }    
 }
 
 void TrioHMM::setIterations(int n) {
@@ -73,7 +77,7 @@ int TrioHMM::setHaps(unsigned char **dadptr,unsigned char **mumptr,unsigned char
 int TrioHMM::forward() {
     int l = 0;
     int kdad,kmum;
-    double noerror = 1. - error;
+    float noerror = 1. - error;
 
     //initial step
     for(int i=0;i<2;i++) {
@@ -103,7 +107,7 @@ int TrioHMM::forward() {
 
     //induction
     int idx1,idx2;
-    double tmp;
+    float tmp;
     for(l=1;l<nsnp;l++) {
 	scale[l]=0.0;
 
@@ -167,7 +171,7 @@ int TrioHMM::forward() {
 
 int TrioHMM::backward() {
     int kdad,kmum;
-    double noerror = 1. - error;
+    float noerror = 1. - error;
 
     for(int i=0;i<K;i++) beta[i].assign(nsnp,0.0);
 
@@ -176,7 +180,7 @@ int TrioHMM::backward() {
     for(int i=0;i<K;i++) beta[i][l] = scale[l];
 
     //induction  
-    double tmp;
+    float tmp;
     for(l=nsnp-2;l>=0;l--) {
 	for(int i2=0;i2<2;i2++) {
 	    for(int j2=0;j2<2;j2++) {
@@ -236,12 +240,12 @@ int TrioHMM::backward() {
 
 int TrioHMM::EM(int niteration) {
 
-    double switch_dad_old=switch_dad;
-    double switch_mum_old=switch_mum;
-    double switch_child_old=switch_child;
-    double error_old=error;
-    double tol=0.00001;
-    double dif=2*tol;
+    float switch_dad_old=switch_dad;
+    float switch_mum_old=switch_mum;
+    float switch_child_old=switch_child;
+    float error_old=error;
+    float tol=0.00001;
+    float dif=2*tol;
     int i=0;
 
     while(i<niteration && dif>tol) {
@@ -270,16 +274,16 @@ int TrioHMM::EM(int niteration) {
 
 int TrioHMM::mstep() {
 
-    double ngenerror = 0.0;
-    double nswitch_dad = 0.0;
-    double nswitch_mum = 0.0;
-    double nswitch_child = 0.0;
+    float ngenerror = 0.0;
+    float nswitch_dad = 0.0;
+    float nswitch_mum = 0.0;
+    float nswitch_child = 0.0;
     int nhet_mum=0;
     int nhet_dad=0;
     int nhet_child=0;
     int nhet_inf=0;
     int kdad,kmum;
-    double  nconsistent = 0;
+    float  nconsistent = 0;
     genError.assign(nsnp,0.0);
 
     for(int l=0;l<nsnp;l++) {
@@ -378,10 +382,10 @@ int TrioHMM::mstep() {
 int TrioHMM::estep() {
     forward();
     backward();
-    double noerror = 1. - error;
+    float noerror = 1. - error;
 
 
-    double denominator;
+    float denominator;
     for(int l=0;l<nsnp;l++) {
 	denominator = 0.0;
 	for(int i=0;i<K;i++) {
@@ -392,7 +396,7 @@ int TrioHMM::estep() {
     }
 
     int kdad,kmum;
-    double aij;
+    float aij;
     for(int l=0;l<nsnp-1;l++) {
 	denominator = 0.0;
 	for(int i2=0;i2<2;i2++) {
@@ -455,8 +459,8 @@ int TrioHMM::estep() {
 
 int TrioHMM::viterbi() {
     int l = 0;
-    double logerror = log(error);
-    double lognoerror = log(1. - error);
+    float logerror = log(error);
+    float lognoerror = log(1. - error);
     stateseq.resize(nsnp);
     backtrack.resize(K);
     for(int i=0;i<K;i++) backtrack[i].assign(nsnp,0);
@@ -487,7 +491,7 @@ int TrioHMM::viterbi() {
 
     //induction
     int idx1,idx2;
-    vector<double> tmp(K,0.0);
+    vector<float> tmp(K,0.0);
 
     for(l=1;l<nsnp;l++) {
 
@@ -567,11 +571,11 @@ int TrioHMM::estimateRecombination()
 }
 
 int TrioHMM::estimateRecombinationDad() {
-    double r,rho_dad;
-    double noerror = 1. - error;
+    float r,rho_dad;
+    float noerror = 1. - error;
     int prevhet=-1;
     int l=0;
-    double p1,p2,recp;
+    float p1,p2,recp;
     int kdad,kmum;
     while(dad[0][l]==dad[1][l]) l++;
     prevhet=l;
@@ -587,7 +591,7 @@ int TrioHMM::estimateRecombinationDad() {
 	    rho_dad = 1 - exp(-male_multiplier*r);
 	    //      rho_dad = 0.5;
 	    recp = 0.0;
-	    double denominator=0;//recombination probability
+	    float denominator=0;//recombination probability
 
 	    for(int i2=0;i2<2;i2++) {
 		for(int j2=0;j2<2;j2++) {
@@ -653,11 +657,11 @@ int TrioHMM::estimateRecombinationDad() {
 }
 
 int TrioHMM::estimateRecombinationMum() {
-    double r,rho_mum;
-    double noerror = 1. - error;
+    float r,rho_mum;
+    float noerror = 1. - error;
     int prevhet=-1;
     int l=0;
-    double p1,p2,recp;
+    float p1,p2,recp;
     int kdad,kmum;
 
     while(mum[0][l]==mum[1][l]) l++;
@@ -672,7 +676,7 @@ int TrioHMM::estimateRecombinationMum() {
 	    if(r<=0.0) r = 1e-13;//hack to handle positions with same genetic location (which shouldnt be in the snps in the first place)
 	    rho_mum = 1 - exp(-female_multiplier*r);
 	    recp = 0.0;
-	    double denominator=0;//recombination probability
+	    float denominator=0;//recombination probability
 
 	    for(int i2=0;i2<2;i2++) {
 		for(int j2=0;j2<2;j2++) {

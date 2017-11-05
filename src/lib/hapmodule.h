@@ -35,7 +35,7 @@ class Haplotypes {
   vector<string> rsid1,rsid2,ref,alt;  
   vector<int> positions;
   map<string,int> idlook;//stores index of samples
-  vector<double> cM;
+  vector<float> cM;
   int nsnp,nhap,K,min_canopy_size,max_canopy_size;
   unsigned char **H;  // haps raw/compressed
   vector<int> allsamples;

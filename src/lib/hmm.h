@@ -13,12 +13,12 @@ class geneticMap{
 #endif
   geneticMap(string fname);
   geneticMap();
-  int interpolate(vector<int> & positions,vector<double> & output);
+  int interpolate(vector<int> & positions,vector<float> & output);
   int nsnp;
-  double interpolate(int position);
+  float interpolate(int position);
  private:
-  vector<double> pos;
-  vector<double> cM;// cM[t] is the genetic distance between snp t and t+1
+  vector<float> pos;
+  vector<float> cM;// cM[t] is the genetic distance between snp t and t+1
 };
 
 class DuoHMM{
@@ -26,20 +26,20 @@ class DuoHMM{
   DuoHMM(vector<int> & positions, geneticMap & gm);
   int nsnp,K,NITERATION;
 
-  double error,switch1,switch2;//parameters
+  float error,switch1,switch2;//parameters
   unsigned char **parent,**child;//pointers to duo haps
 
   //recombination maps
-  double male_multiplier,female_multiplier,male_length,female_length,genetic_length,multi;
-  vector <double> male_rho;
-  vector <double> female_rho;
-  vector <double> male_norho;
-  vector <double> female_norho;
-  vector <double> cM;
-  vector <double> recombinationMap;
-  vector<double> genError;
+  float male_multiplier,female_multiplier,male_length,female_length,genetic_length,multi;
+  vector <float> male_rho;
+  vector <float> female_rho;
+  vector <float> male_norho;
+  vector <float> female_norho;
+  vector <float> cM;
+  vector <float> recombinationMap;
+  vector<float> genError;
 
-  double *rho;
+  float *rho;
 
   int setHaps(unsigned char **parental_haplotypes,unsigned char **child_haplotypes,string sex);
   void setIterations(int n);
@@ -49,13 +49,13 @@ class DuoHMM{
 
 
   //F-B VARIABLES
-  vector < vector<double> > alpha;
-  vector < vector<double> > beta;
-  vector <double> scale;
+  vector < vector<float> > alpha;
+  vector < vector<float> > beta;
+  vector <float> scale;
   int forward();
   int backward();
-  vector < vector<double> > posterior;
-  vector < vector< vector<double> > > trans_posterior;
+  vector < vector<float> > posterior;
+  vector < vector< vector<float> > > trans_posterior;
 
   int estep();
   int mstep();
@@ -72,37 +72,37 @@ class TrioHMM {
   TrioHMM(vector<int> & positions, geneticMap & gm);
   int nsnp,K,NITERATION;
 
-  double error,switch_child,switch_mum,switch_dad;//parameters
+  float error,switch_child,switch_mum,switch_dad;//parameters
   unsigned char **dad, **mum, **child;//pointers to duo haps
 
   //recombination maps
-  double male_multiplier,female_multiplier,male_length,female_length;
-  vector <double> male_rho;
-  vector <double> female_rho;
-  vector <double> male_norho;
-  vector <double> female_norho;
-  vector<double> cM;
-  vector <double> recombinationMat;
-  vector <double> recombinationPat;
+  float male_multiplier,female_multiplier,male_length,female_length;
+  vector <float> male_rho;
+  vector <float> female_rho;
+  vector <float> male_norho;
+  vector <float> female_norho;
+  vector<float> cM;
+  vector <float> recombinationMat;
+  vector <float> recombinationPat;
   int setHaps(unsigned char **dadptr,unsigned char **mumptr,unsigned char **childptr);
   int EM(int niteration);
   void setIterations(int n);
 
   //F-B VARIABLES
-  vector < vector<double> > alpha;
-  vector < vector<double> > beta;
-  vector <double> scale;
+  vector < vector<float> > alpha;
+  vector < vector<float> > beta;
+  vector <float> scale;
   int forward();
   int backward();
   int estimateRecombination();
   int estimateRecombinationDad();
   int estimateRecombinationMum();
-  vector < vector<double> > posterior;
-  vector < vector< vector<double> > > trans_posterior;
+  vector < vector<float> > posterior;
+  vector < vector< vector<float> > > trans_posterior;
 
   int estep();
   int mstep();
-  vector<double> genError;
+  vector<float> genError;
 
   //VITERBI VARIABLES
   vector< vector<unsigned char> > backtrack;
