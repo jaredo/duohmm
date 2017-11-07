@@ -30,14 +30,14 @@ class Haplotypes {
   ~Haplotypes();
   int writeHaps(string fname);
   string input_file;
-  unsigned char **getHap(string id);  
+  vector<bool> *getHap(string id);  
   vector<string> ids;
   vector<string> rsid1,rsid2,ref,alt;  
   vector<int> positions;
   map<string,int> idlook;//stores index of samples
   vector<float> cM;
   int nsnp,nhap,K,min_canopy_size,max_canopy_size;
-  unsigned char **H;  // haps raw/compressed
+  vector<bool> *H;  // haps raw/compressed
   vector<int> allsamples;
   bool isMissing(string & id,int index);
   vector<bool> *getMissing(string & id);

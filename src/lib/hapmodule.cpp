@@ -4,20 +4,20 @@
 
 #define DEBUG 0
 
-Haplotypes::Haplotypes(const Haplotypes& h) {
-  cout << "deep copying"<<endl;
-  nhap = h.nhap;
-  nsnp = h.nsnp;
-
-  H = newMatrix<unsigned char>(nhap,nsnp);
-  for(int i=0;i<nhap;i++) std::memcpy(H[i],h.H[i],nsnp);
-}
+// Haplotypes::Haplotypes(const Haplotypes& h) {
+//   cout << "deep copying"<<endl;
+//   nhap = h.nhap;
+//   nsnp = h.nsnp;
+//   H = new vector<bool>[nhap];
+//   for(int i=0;i<nhap;i++) 
+//     H[i].assign(H.h[i].begin(),H.h[i].end());
+// }
 
 Haplotypes::~Haplotypes() {
-  delMatrix<unsigned char>(H,nhap);
+  delete[] H;
 }
 
-unsigned char **Haplotypes::getHap(string id){
+vector<bool> *Haplotypes::getHap(string id){
   assert(idlook.count(id));
   return(&H[idlook[id]*2]);
 }
@@ -74,7 +74,8 @@ Haplotypes::Haplotypes(string filename) {
   inf2.close();
   inf2.open((filename+".haps").c_str());
 
-  H = newMatrix<unsigned char>(nhap,nsnp);
+  H = new vector<bool>[nhap];
+  for(int j=0;j<nhap;j++) H[j].assign(nsnp,0);
   string tmp;
   for(int i=0;i<nsnp;i++) {
     if(!inf2) {
@@ -182,7 +183,8 @@ Haplotypes::Haplotypes(filter_writer & F, genhap_set & GH){//builds haps from a 
     idlook[name]=i;
   }
 
-  H = newMatrix<unsigned char>(nhap,nsnp);
+  H = new vector<bool>[nhap];
+  for(int i=0;i<nsnp;i++) H[i].assign(nsnp);
   positions.resize(nsnp);
   ref.assign(nsnp,"A");
   alt.assign(nsnp,"A");

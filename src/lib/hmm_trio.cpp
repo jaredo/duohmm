@@ -60,7 +60,7 @@ void TrioHMM::setIterations(int n) {
     NITERATION = n;
 }
 
-int TrioHMM::setHaps(unsigned char **dadptr,unsigned char **mumptr,unsigned char **childptr) {
+int TrioHMM::setHaps(vector<bool> *dadptr,vector<bool> *mumptr,vector<bool> *childptr) {
     assert(dadptr!=nullptr && mumptr!=nullptr &&childptr!=nullptr);
     dad = dadptr;
     mum = mumptr;
