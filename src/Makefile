@@ -17,14 +17,16 @@ debug: CFLAGS = -g -Wall $(IFLAGS) -std=c++11
 debug: all
 
 OBJS=obj/pedhap.o obj/hapmodule.o obj/utilityfunc.o obj/pedigree.o obj/hmm_duo.o obj/hmm_trio.o  
+obj/:
+	mkdir obj
 duohmm: $(OBJS) duohmm.cpp 
 	$(CXX) -DVERSION=\"$(VERSION)\" $(OBJS) duohmm.cpp -o $@ $(CFLAGS)  $(LFLAGS) -Ilib/
 unit_test: $(OBJS) test.cpp
 	$(CXX)  test.cpp $(OBJS) -o test $(CFLAGS)
-obj/%.o: lib/%.cpp $(HFILE)
+obj/%.o: lib/%.cpp $(HFILE) obj/
 	$(CXX) -o $@ -c $< $(CFLAGS) $(IFLAGS)
 test: duohmm
 	cd ../test/;bash -e test.sh
 clean:
-	rm -f obj/*.o
+	rm -rf obj/
 	rm -f duohmm unit_test ../test/observed.*

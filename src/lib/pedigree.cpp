@@ -91,7 +91,7 @@ int pedigree::fromSample(string fname,vector<string> & ids) {
     }
     
   }
-  cout << count << " samples in " << fname << endl;
+  //cout << count << " samples in " << fname << endl;
   buildPeds();
   delete[] header;
   return 0;

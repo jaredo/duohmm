@@ -79,7 +79,7 @@ Haplotypes::Haplotypes(string filename) {
   string tmp;
   for(int i=0;i<nsnp;i++) {
     if(!inf2) {
-      cerr << "Problem reading "<<filename<<".haps" <<endl;
+      cerr << "Problem reading "<<filename<<".haps at line "<<i <<endl;
       exit(1);
     }
     inf2 >> tmp;
@@ -95,12 +95,12 @@ Haplotypes::Haplotypes(string filename) {
     //    cout << rsid1[i] << " "<< rsid2[i] << " " << positions[i] << " " << ref[i] << " " << alt[i] << endl;
     //for(int j=0;j<5;j++) inf2.ignore(1000,' ');
     for(int j=0;j<nhap;j++) {
-      unsigned   int hapval;
+      int hapval;
       //      inf2 >> c;
       //      H[j][i] = atoi(&c);
       inf2 >> hapval;
       H[j][i] = hapval;
-      if(!(H[j][i]==0 || H[j][i]==1)) {
+      if(!(hapval==0 || hapval==1)) {
 	cerr << "INVALID VALUE IN HAPLOTYPE FILE ON LINE " << i+1 << " COLUMN " << j+6 <<  "\n" << hapval << " " <<(unsigned int) H[j][i] << "\nExiting..."<<endl;
 	exit(1);
       }
@@ -134,7 +134,7 @@ int Haplotypes::writeHaps(string fname) {
   outfname = fname+".sample";
   ifstream  src(infname.c_str(), std::ios::binary);
   if(!src) {
-    cerr << "Probleam reading "<<infname <<endl;
+    cerr << "Problem reading "<<infname <<endl;
     exit(1);
   }
   ofstream  dst(outfname.c_str(),   std::ios::binary);

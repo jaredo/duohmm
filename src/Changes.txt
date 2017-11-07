@@ -1,5 +1,14 @@
+2017-11-07
+	*Haplotypes are now stored as vector<bool> which should improve memory efficiency.
+	*Changed from double to float precision. No difference in output and better speed/memory.
+	*Ordering of child haplotypes in a duo used to be (observed parent, unobserved). We now enforce (dad,mum) ordereding regardless of which parent was assayed.
+
+2017-11-01
+	*DuoHMM now re-imputes genotypes that were missing in the original data using some simple inheritance rules. This avoids occasional Mendelian inconsistencies.
+
 2017-10-24
 	*added SHAPEIT2 integration directly to the duohmm master repository. The duohmm src directory can now be copied directly to SHAPEIT2 and will compile seemlessly
+
 2015-07-15
 	*version v0.1.7
 	*fixed a bug when reading in pedigree information
