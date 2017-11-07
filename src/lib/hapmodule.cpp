@@ -184,7 +184,7 @@ Haplotypes::Haplotypes(filter_writer & F, genhap_set & GH){//builds haps from a 
   }
 
   H = new vector<bool>[nhap];
-  for(int i=0;i<nsnp;i++) H[i].assign(nsnp);
+  for(int i=0;i<nhap;i++) H[i].assign(nsnp,0);
   positions.resize(nsnp);
   ref.assign(nsnp,"A");
   alt.assign(nsnp,"A");
