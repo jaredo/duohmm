@@ -1,6 +1,9 @@
+//$Id$
+
 #include "hapmodule.h"
 
 #define DEBUG 0
+
 Haplotypes::Haplotypes(const Haplotypes& h) {
   cout << "deep copying"<<endl;
   nhap = h.nhap;
@@ -143,7 +146,9 @@ int Haplotypes::writeHaps(string fname) {
 //these routines deals specifically with converting to/from SHAPEIT2 data structures
 
 Haplotypes::Haplotypes(filter_writer & F, genhap_set & GH){//builds haps from a S2 genhaptset
-  //haplotype_writer::haplotype_writer(filter_writer & _F, genhap_set & _GH, string header1, string header2, bool founder) : F(_F), GH(_GH) {
+    _F = &F;
+    _GH = &GH;
+    //haplotype_writer::haplotype_writer(filter_writer & _F, genhap_set & _GH, string header1, string header2, bool founder) : F(_F), GH(_GH) {
 
   //INTERNAL DATA
 
@@ -183,7 +188,7 @@ Haplotypes::Haplotypes(filter_writer & F, genhap_set & GH){//builds haps from a 
   alt.assign(nsnp,"A");
   rsid1.resize(nsnp,"-");
   rsid2.resize(nsnp,"-");
-
+  _missing.assign(nhap/2,vector<bool>(nsnp,false));
    //now we convert the haplotypes.
   for (int l = 0 ; l < GH.mapG->size() ; l ++) {
     snp * s = GH.mapG->vec_pos[l];
@@ -193,7 +198,7 @@ Haplotypes::Haplotypes(filter_writer & F, genhap_set & GH){//builds haps from a 
 	int type = orderI[i].type;
 	unsigned int a1,a2;
 	assert(!(type == DUO_F || type == TRIO_F)  && !(type == DUO_M || type == TRIO_M));
-
+	_missing[i][l] = GH.vecG[orderI[i].indexG]->Miss[l];
 	a1 = GH.vecH[GH.G2H[orderI[i].indexG][0]][l];
 	a2 = GH.vecH[GH.G2H[orderI[i].indexG][1]][l];
 
@@ -222,6 +227,27 @@ int Haplotypes::getSHAPEIT2(filter_writer & F, genhap_set & GH){//puts haplotype
     }
   }
   return(0);
+}
+
+
+bool Haplotypes::isMissing(string & id,int index)
+{
+    assert(!_missing.empty());
+    assert(idlook.count(id));
+    return _missing[idlook[id]][index];
+}
+
+
+vector<bool> *Haplotypes::getMissing(string & id)
+{
+    if(idlook.count(id))
+    {
+	return(&_missing[idlook[id]]);
+    }
+    else
+    {
+	return nullptr;
+    }
 }
 
 #endif

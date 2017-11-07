@@ -1,3 +1,5 @@
+//$Id$
+
 #include "hmm.h"
 
 geneticMap::geneticMap(string fname){
@@ -13,7 +15,7 @@ geneticMap::geneticMap(string fname){
       exit(1);
     }
     int tmp1;
-    double tmp2,tmp3;
+    float tmp2,tmp3;
     inf2.ignore(1000,'\n');
     while(inf2) {
       inf2 >> tmp1;
@@ -54,7 +56,7 @@ geneticMap::geneticMap() {
   nsnp = 2;
 }
 
-double geneticMap::interpolate(int position) {
+float geneticMap::interpolate(int position) {
   int i=0;
   while(i<nsnp && pos[i]<=position) {
     i++;
@@ -68,10 +70,10 @@ double geneticMap::interpolate(int position) {
 #endif
   }
 
-  return(  cM[i-1] + (cM[i]-cM[i-1])*(double)(position-pos[i-1])/(double)(pos[i]-pos[i-1]) );
+  return(  cM[i-1] + (cM[i]-cM[i-1])*(float)(position-pos[i-1])/(float)(pos[i]-pos[i-1]) );
 }
 
-int geneticMap::interpolate(vector<int> & positions,vector<double> & output){
+int geneticMap::interpolate(vector<int> & positions,vector<float> & output){
   output.resize(positions.size());
 
   for(size_t i=0;i<positions.size();i++) {
@@ -91,7 +93,7 @@ void DuoHMM::setIterations(int n) {
 DuoHMM::DuoHMM(vector<int> & positions, geneticMap & gm)
 {
   NITERATION=100;
-  double r;
+  float r;
   male_multiplier = 0.7539868;
   female_multiplier = 1.2460132; 
   K=4;
@@ -117,21 +119,25 @@ DuoHMM::DuoHMM(vector<int> & positions, geneticMap & gm)
   }
 
   scale.resize(nsnp);
-  alpha.resize(K);
-  beta.resize(K);
-  posterior.resize(K);
-  trans_posterior.resize(K);
 
+  alpha.assign(K,vector<float>(nsnp));
+  beta.assign(K,vector<float>(nsnp));
+  posterior.assign(K,vector<float>(nsnp));
+  
+  // alpha.resize(K);
+  // beta.resize(K);
+  // posterior.resize(K);
+  // for(int i=0;i<K;i++) {
+  //   alpha[i].resize(nsnp);
+  //   beta[i].resize(nsnp);
+  //   posterior[i].resize(nsnp);
+  // }
+
+  trans_posterior.resize(K);
   for(int i=0;i<K;i++)  {
     trans_posterior[i].resize(K);
     for(int j=0;j<K;j++) 
       trans_posterior[i][j].resize(nsnp,0.0);
-  }
-
-  for(int i=0;i<K;i++) {
-    alpha[i].resize(nsnp);
-    beta[i].resize(nsnp);
-    posterior[i].resize(nsnp);
   }
 
   error = 0.001;
@@ -142,7 +148,7 @@ DuoHMM::DuoHMM(vector<int> & positions, geneticMap & gm)
   
 int DuoHMM::forward() {
   int l = 0;
-  double noerror = 1. - error;
+  float noerror = 1. - error;
   scale.assign(nsnp,0.0);
   for(int i=0;i<K;i++) alpha[i].assign(nsnp,0.0);
 
@@ -161,7 +167,7 @@ int DuoHMM::forward() {
 
   //induction
   int idx1,idx2;
-  double tmp;
+  float tmp;
   for(l=1;l<nsnp;l++) {
     for(int i2=0;i2<2;i2++) {
       for(int j2=0;j2<2;j2++) {
@@ -203,7 +209,7 @@ int DuoHMM::forward() {
 }
 
 int DuoHMM::backward() {
-  double noerror = 1. - error;
+  float noerror = 1. - error;
   int l = nsnp-1;
   for(int i=0;i<K;i++) beta[i].assign(nsnp,0.0);
 
@@ -212,7 +218,7 @@ int DuoHMM::backward() {
 
   //induction
   
-  double tmp;
+  float tmp;
   for(l=nsnp-2;l>=0;l--) {
     for(int i2=0;i2<2;i2++) {
       for(int j2=0;j2<2;j2++) {
@@ -269,11 +275,11 @@ int DuoHMM::setHaps(unsigned char **parental_haplotypes,unsigned char **child_ha
 int DuoHMM::EM(int niteration) {
 
 
-  double switch1_old=switch1;
-  double switch2_old=switch2;
-  double error_old=error;
-  double tol=0.00001;
-  double dif=2*tol;
+  float switch1_old=switch1;
+  float switch2_old=switch2;
+  float error_old=error;
+  float tol=0.00001;
+  float dif=2*tol;
   int i=0;
   while(i<niteration && dif>tol) {
     if(DEBUG>1) {
@@ -298,9 +304,9 @@ int DuoHMM::EM(int niteration) {
 
 int DuoHMM::mstep() {
 
-  double ngenerror = 0.0;
-  double nswitch1 = 0.0;
-  double nswitch2 = 0.0;
+  float ngenerror = 0.0;
+  float nswitch1 = 0.0;
+  float nswitch2 = 0.0;
   int nhet1=0;
   int nhet2=0;
   int nhet3=0;
@@ -368,9 +374,9 @@ int DuoHMM::mstep() {
 int DuoHMM::estep() {
   forward();
   backward();
-  double noerror = 1. - error;
+  float noerror = 1. - error;
 
-  double denominator;
+  float denominator;
   for(int l=0;l<nsnp;l++) {
     denominator = 0.0;
     for(int i=0;i<K;i++) {
@@ -380,7 +386,7 @@ int DuoHMM::estep() {
     for(int i=0;i<K;i++) posterior[i][l] /= denominator;
   }
 
-  double aij;
+  float aij;
   for(int l=0;l<(nsnp-1);l++) {
     assert(l<(nsnp-1));
     if(!(rho[l]>=0.0 && rho[l]<1.)) {
@@ -431,7 +437,7 @@ int DuoHMM::estep() {
 	for(int i1=0;i1<2;i1++) {//transition probs
 	  for(int j1=0;j1<2;j1++) {
 	    int idx1 = i1*2+j1;
-	    //	    double tmp = trans_posterior[idx1][idx2][l];
+	    //	    float tmp = trans_posterior[idx1][idx2][l];
 	    trans_posterior[idx1][idx2][l] /= denominator;
 	    //	    if(trans_posterior[idx1][idx2][l] > 0.5 && i1!=i2) 
 	    //	      cout << l << "\t" << idx1 << "\t" << idx2 << "\t" << tmp << "\t" << denominator << endl;	    
@@ -448,8 +454,8 @@ int DuoHMM::estep() {
 
 int DuoHMM::viterbi() {
   int l = 0;
-  double logerror = log(error);
-  double lognoerror = log(1. - error);
+  float logerror = log(error);
+  float lognoerror = log(1. - error);
   stateseq.resize(nsnp);
   backtrack.resize(K);
   for(int i=0;i<K;i++) backtrack[i].assign(nsnp,0);
@@ -466,7 +472,7 @@ int DuoHMM::viterbi() {
 
   //induction
   int idx1,idx2;
-  vector<double> tmp(4,0.0);
+  vector<float> tmp(4,0.0);
   for(l=1;l<nsnp;l++) {
     for(int i2=0;i2<2;i2++) {
       for(int j2=0;j2<2;j2++) {
@@ -521,19 +527,19 @@ int DuoHMM::estimateRecombination() {
 
   recombinationMap.assign(nsnp,0.0);
   EM(NITERATION);
-  double noerror = 1. - error;
-  double r,rho2;
+  float noerror = 1. - error;
+  float r,rho2;
   int prevhet=-1;
   int l=0;
   while(parent[0][l]==parent[1][l]) l++;
   prevhet=l;
 
-  vector <double> p;
+  vector <float> p;
 
   while(l<nsnp) {
 
-    double recp=0;
-    double denominator=0,p1,p2;
+    float recp=0;
+    float denominator=0,p1,p2;
     while(parent[0][l]==parent[1][l] && l<nsnp) l++;
 
     if(l<nsnp) {

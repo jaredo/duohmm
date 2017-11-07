@@ -1,3 +1,5 @@
+//$Id$
+
 #include "pedhap.h"
 
 int unswitch(unsigned char **h,int start,int stop) {
@@ -22,13 +24,14 @@ pedhap::pedhap(filter_writer & F,genhap_set & GH,string header1,string header2,i
   NITERATION=niteration;
   if(VERBOSE) cout << "converting haps" <<endl;
   haps =  new Haplotypes(F,GH);
-  ped = new  pedigree(F,GH, header1, header2,haps->ids);
+  ped = new pedigree(F,GH, header1, header2,haps->ids);
   if(VERBOSE) cout << "reading genetic map." <<endl;
   gm = new geneticMap(GH);
   duo =  new DuoHMM(haps->positions,*gm);
   trio =  new TrioHMM(haps->positions,*gm);
   nsnp = haps->positions.size();  
 }
+
 #endif
 
 //constructor
@@ -62,16 +65,6 @@ pedhap::~pedhap()
   delete duo;
   delete trio;
 }
-/*
-pedhap::pedhap(string hap_filename,string pedigree_filename) {
-  haps =  new Haplotypes(hap_filename);
-  ped = new pedigree(pedigree_filename,haps->ids);
-  gm = new geneticMap();
-  duo =  new DuoHMM(haps->positions,*gm);
-  trio =  new TrioHMM(haps->positions,*gm);
-  nsnp = haps->positions.size();
-}
-*/
 
 int pedhap::phase(string child) {
   if(DEBUG>0)  cout << child << endl;
@@ -82,9 +75,21 @@ int pedhap::phase(string child) {
     cout << "Phasing " << child << " - " << dad << " - " << mum << endl;
   }
   assert(ped->sampleinfo.count(dad)  ||  ped->sampleinfo.count(mum));
+#ifdef SHAPEIT
+  vector<bool> *kid_missing = haps->getMissing(child);
+  vector<bool> *dad_missing = haps->getMissing(dad);
+  vector<bool> *mum_missing = haps->getMissing(mum);
+  vector<bool> *parent_missing =nullptr;
+  if(mum.compare("0")!=0) 
+      parent_missing = mum_missing;
+  if(dad.compare("0")!=0) 
+      parent_missing = dad_missing;
+#endif
   unsigned char **d=nullptr,**m=nullptr,**p=nullptr;
   unsigned char **c = haps->getHap(child);
   pair<string,string> key,key1,key2;
+
+  //trio
   if(dad.compare("0")!=0 && mum.compare("0")!=0) {
     d = haps->getHap(dad);
     m = haps->getHap(mum);
@@ -103,9 +108,9 @@ int pedhap::phase(string child) {
       stateseq[key2][l] = 2*((s%4)/2) + ((s%2)+1)%2;
     }
   } 
-  else {
+  else {//duos
     if(dad.compare("0")!=0) {
-      p = haps->getHap(dad);  
+	p = haps->getHap(dad);  
       duo->setHaps(p,c,"1");
       key = make_pair(dad,child);
     }
@@ -117,15 +122,16 @@ int pedhap::phase(string child) {
     duo->EM(NITERATION);
     duo->viterbi();    
     stateseq[key] = duo->stateseq;
-  } 
-  
+  }
+
   if(dad.compare("0")!=0) {
     key1 = make_pair(dad,child);
     int haporder = 0;
     for(int l=0;l<nsnp;l++) 
       if(stateseq[key1][l]%2!=haporder && c[0][l]!=c[1][l]) 
 	unswitch(c,l,l+1);
-  } else if(mum.compare("0")!=0) {
+  }
+  else if(mum.compare("0")!=0) {
     key2 = make_pair(mum,child);
     int haporder = 0;
     for(int l=0;l<nsnp;l++) 
@@ -133,20 +139,85 @@ int pedhap::phase(string child) {
 	unswitch(c,l,l+1);
   }
 
-  if(dad.compare("0")!=0 && mum.compare("0")!=0) {
-    trio->setHaps(d,m,c);
-    trio->EM(NITERATION);
-    trio->viterbi();
-    for(int l=0;l<nsnp;l++) {
-      unsigned char s = trio->stateseq[l];
-      stateseq[key1][l] = 2*(s/4) + s%2;
-      stateseq[key2][l] = 2*((s%4)/2) + ((s%2)+1)%2;
-    }
+  if(dad.compare("0")!=0 && mum.compare("0")!=0)
+  {
+      trio->setHaps(d,m,c);
+      trio->EM(NITERATION);
+      trio->viterbi();
+      for(int l=0;l<nsnp;l++)
+      {
+	  unsigned char s = trio->stateseq[l];
+	  stateseq[key1][l] = 2*(s/4) + s%2;
+	  stateseq[key2][l] = 2*((s%4)/2) + ((s%2)+1)%2;
+	  
+#ifdef SHAPEIT	  
+//re-impute missing genotypes
+	  bitset<3> b(s);
+	  int mum_src = b[1];	  
+	  int dad_src = b[2];
+
+	  //always impute a missing child directly from parents
+	  if((*kid_missing)[l])
+	  {
+	      c[b[0]][l] = d[dad_src][l];
+	      c[(b[0]+1)%2][l] = m[mum_src][l];
+//	      assert(is_mendel_consistent(c[0][l]+c[1][l],d[0][l]+d[1][l],m[0][l]+m[1][l]));//debug	      
+//	      debugging	      
+//	      std::cerr << "MISSING KID "<< child <<" "<<dad<<" "<<mum<<" "<<haps->positions[l]<<" "<<(int)trio->stateseq[l]<<" "<<b[0]<<b[1]<<b[2];
+//	      std::cerr<<" "<<(int)c[0][l]<<" "<<(int)c[1][l]<<" "<<(int)m[0][l]<<" "<<(int)m[1][l]<<" "<<(int)d[0][l]<<" "<<(int)d[1][l]<<endl;
+	  }
+	  
+	  //if there is mendel inconsistency. impute missing parents from child
+	  if(!is_mendel_consistent(c[0][l]+c[1][l],d[0][l]+d[1][l],m[0][l]+m[1][l]))
+	  {
+	      if((*dad_missing)[l] && (*mum_missing)[l])
+	      {
+		  d[dad_src][l]=c[b[0]][l];
+		  m[mum_src][l] = c[(b[0]+1)%2][l];	      
+	      }
+	      else if((*dad_missing)[l])
+	      {
+		  d[dad_src][l]=c[b[0]][l];
+		  if(!is_mendel_consistent(c[0][l]+c[1][l],d[0][l]+d[1][l],m[0][l]+m[1][l]))
+		  {
+		      d[dad_src][l] = (d[dad_src][l]+1)%2;
+		  }
+	      }
+	      else if((*mum_missing)[l])
+	      {
+		  m[mum_src][l] = c[(b[0]+1)%2][l];
+		  if(!is_mendel_consistent(c[0][l]+c[1][l],d[0][l]+d[1][l],m[0][l]+m[1][l]))
+		  {
+		      m[mum_src][l] = (m[mum_src][l]+1)%2;
+		  }
+	      }
+	  }
+#endif
+	  
+      }
   } 
-  else {
-    duo->EM(NITERATION);
-    duo->viterbi();    
-    stateseq[key] = duo->stateseq;
+  else
+  {
+      duo->EM(NITERATION);
+      duo->viterbi();    
+      stateseq[key] = duo->stateseq;
+#ifdef SHAPEIT //re-impute missing genotypes
+      for(int l=0;l<nsnp;l++)
+      {
+	  unsigned char s = duo->stateseq[l];
+	  bitset<2> b(s);
+	  int src = b[1];
+	  int dst = b[0];
+	  if((*kid_missing)[l])
+	  {
+	      c[dst][l] = p[src][l];
+	  }
+	  if((*parent_missing)[l])
+	  {
+	      p[src][l]=c[dst][l];
+	  }
+      }
+#endif
   } 
 
   return(0);
@@ -168,17 +239,6 @@ int pedhap::minRecombinant(string parent) {
   unsigned char **p = haps->getHap(parent);
   set<string> kids = ped->sampleinfo[parent].kids;
   int prevhet=-1;
-
-  /*
-    for(set<string>::iterator it1=kids.begin();it1!=kids.end();it1++) {
-    unsigned char **c = haps->getHap(*it1);
-    duo->setHaps(p,c,ped->sampleinfo[parent].sex);  
-    duo->EM(NITERATION);
-    duo->viterbi();
-    pair<string,string> key(parent,*it1);
-    stateseq[key] = duo->stateseq;
-    }
-  */
 
   for(int l=0;l<nsnp;l++) {
     if(p[0][l]!=p[1][l]){
@@ -221,23 +281,27 @@ int pedhap::correct() {
 #endif
   
   //this does the phasing
-  for(vector< set<string> >::iterator it1=ped->pedigrees.begin(); it1!=ped->pedigrees.end(); it1++) {
-    vector<string> idorder;
-    ped->orderSamples(*it1,idorder);
-    for(vector<string>::iterator it2=idorder.begin();it2!=idorder.end();it2++) {
-      string dad = ped->sampleinfo[*it2].dad;
-      string mum = ped->sampleinfo[*it2].mum;
-      if(dad.compare("0")!=0 || mum.compare("0")!=0)  {
-	num_phased++;
-	phase(*it2);
+  for(vector< set<string> >::iterator it1=ped->pedigrees.begin(); it1!=ped->pedigrees.end(); it1++)
+  {
+      vector<string> idorder;
+      ped->orderSamples(*it1,idorder);
+      for(vector<string>::iterator it2=idorder.begin();it2!=idorder.end();it2++)
+      {
+	  string dad = ped->sampleinfo[*it2].dad;
+	  string mum = ped->sampleinfo[*it2].mum;
+	  if(dad.compare("0")!=0 || mum.compare("0")!=0)
+	  {
+	      num_phased++;
+	      phase(*it2);
 #ifdef SHAPEIT
-	cout << "Correcting haplotypes based on pedigree structure ["<<num_phased<<"/"<<num_phaseable<< "]\r";
+	      cout << "Correcting haplotypes based on pedigree structure ["<<num_phased<<"/"<<num_phaseable<< "]\r";
 #endif
+	  }
       }
-    }
-    for(vector<string>::iterator it2=idorder.begin();it2!=idorder.end();it2++)  {
-      minRecombinant(*it2);
-    }
+      for(vector<string>::iterator it2=idorder.begin();it2!=idorder.end();it2++)
+      {
+	  minRecombinant(*it2);
+      }
   }
   cout<<endl;
 
@@ -267,7 +331,7 @@ int pedhap::genotypingError(string outfile) {
 	trio->setHaps(d,m,c);
 	trio->EM(NITERATION);
 	for(int l=0;l<nsnp;l++) {
-	  double p = trio->genError[l];
+	  float p = trio->genError[l];
 	  if(p>0.1) {
 	    outf << *it2 << "\t" << dad << "\t" << mum;
 	    outf << "\t"<< haps->rsid1[l]<< "\t"  << haps->positions[l];
@@ -282,7 +346,7 @@ int pedhap::genotypingError(string outfile) {
 	duo->setHaps(d,c,"1");
 	duo->EM(NITERATION);
 	for(int l=0;l<nsnp;l++) {
-	  double p = duo->genError[l];
+	  float p = duo->genError[l];
 	  if(p>0.1) {
 	    outf << *it2 << "\t" << dad << "\t" << mum;
 	    outf << "\t"<< haps->rsid1[l]<< "\t" << haps->positions[l];
@@ -296,7 +360,7 @@ int pedhap::genotypingError(string outfile) {
 	duo->setHaps(m,c,"2");
 	duo->EM(NITERATION);
 	for(int l=0;l<nsnp;l++) {
-	  double p = duo->genError[l];
+	  float p = duo->genError[l];
 	  if(p>0.1) {
 	    outf << *it2 << "\t" << dad << "\t" << mum;
 	    outf << "\t" << haps->rsid1[l]<< "\t" << haps->positions[l];

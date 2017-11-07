@@ -1,3 +1,5 @@
+//$Id$
+
 #pragma once
 #include <utility> 
 #include <vector>
@@ -73,4 +75,6 @@ void printMatrix(T **H,int nrow,int ncol) {
 
 bool fileexists(string fname);
 
-int argmax(vector<double> & x);
+int argmax(vector<float> & x);
+
+bool is_mendel_consistent(int k,int d,int m);
