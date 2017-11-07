@@ -249,7 +249,7 @@ int DuoHMM::backward() {
   return(0);
 }
 
-int DuoHMM::setHaps(unsigned char **parental_haplotypes,unsigned char **child_haplotypes,string sex) {
+int DuoHMM::setHaps(vector<bool> *parental_haplotypes,vector<bool> *child_haplotypes,string sex) {
   assert(parental_haplotypes!=nullptr && child_haplotypes!=nullptr);
   //  cout << sex << endl;
   assert(sex.compare("1")==0 || sex.compare("2")==0);

@@ -27,7 +27,7 @@ class DuoHMM{
   int nsnp,K,NITERATION;
 
   float error,switch1,switch2;//parameters
-  unsigned char **parent,**child;//pointers to duo haps
+  vector<bool> *parent,*child;//pointers to duo haps
 
   //recombination maps
   float male_multiplier,female_multiplier,male_length,female_length,genetic_length,multi;
@@ -41,7 +41,7 @@ class DuoHMM{
 
   float *rho;
 
-  int setHaps(unsigned char **parental_haplotypes,unsigned char **child_haplotypes,string sex);
+  int setHaps(vector<bool> *parental_haplotypes,vector<bool> *child_haplotypes,string sex);
   void setIterations(int n);
 
   int EM(int niteration);
@@ -73,7 +73,7 @@ class TrioHMM {
   int nsnp,K,NITERATION;
 
   float error,switch_child,switch_mum,switch_dad;//parameters
-  unsigned char **dad, **mum, **child;//pointers to duo haps
+  vector<bool> *dad, *mum, *child;//pointers to duo haps
 
   //recombination maps
   float male_multiplier,female_multiplier,male_length,female_length;
@@ -84,7 +84,7 @@ class TrioHMM {
   vector<float> cM;
   vector <float> recombinationMat;
   vector <float> recombinationPat;
-  int setHaps(unsigned char **dadptr,unsigned char **mumptr,unsigned char **childptr);
+  int setHaps(vector<bool> *dadptr,vector<bool> *mumptr,vector<bool> *childptr);
   int EM(int niteration);
   void setIterations(int n);
 
