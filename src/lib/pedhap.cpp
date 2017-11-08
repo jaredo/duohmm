@@ -175,11 +175,10 @@ int pedhap::phase(string child)
 #ifdef SHAPEIT
       //re-impute missing genotypes
       //when entire trio/duo is missing. re-impute parents from population
-      if ((*kid_missing)[l] && (*dad_missing)[l] && (*mum_missing)[l])
-      {
+      if ((*kid_missing)[l] && (*dad_missing)[l])
 	  haps->impute(dad,l);
+      if ((*kid_missing)[l] && (*mum_missing)[l])
 	  haps->impute(mum,l);	  
-      }
       
       bitset<3> b(s);
       int mum_src = b[1];
