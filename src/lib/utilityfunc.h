@@ -19,7 +19,6 @@ unsigned char** buildLookup();
 
 int which_max(int *x,int n);
 
-
 template <class T>
 bool comparator ( const pair<T,int>& l, const pair<T,int>& r)  { return l.first < r.first; };
 
@@ -45,8 +44,6 @@ inline int ham(unsigned char*x1,unsigned char*x2,int n,unsigned char**look) {
     d += look[x1[i]][x2[i]];
   return(d);
 }
-
-
 
 template <class T>
 T **newMatrix(int nrow,int ncol) {

@@ -41,14 +41,19 @@ class Haplotypes {
   vector<int> allsamples;
   bool isMissing(string & id,int index);
   vector<bool> *getMissing(string & id);
-  
+  vector < vector<bool> > _missing;
+  int setMissing(const string & fname);
+  vector<float> Lmatch,Rmatch;
+  float impute(int hap_index,int pos_index);
+  int imputeAll();
+  int imputeSample(string const & id);
+
 #ifdef SHAPEIT
   Haplotypes(filter_writer & F, genhap_set & GH);
   int getSHAPEIT2(filter_writer & F, genhap_set & GH);
   vector < haplotype_index > orderI;
   filter_writer * _F;
   genhap_set * _GH;
-  vector < vector<bool> > _missing;
 #endif
 
 };
