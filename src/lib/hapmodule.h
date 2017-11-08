@@ -47,7 +47,8 @@ class Haplotypes {
   float impute(int hap_index,int pos_index);
   int imputeAll();
   int imputeSample(string const & id);
-
+  void impute(string const & id,int pos_index);
+      
 #ifdef SHAPEIT
   Haplotypes(filter_writer & F, genhap_set & GH);
   int getSHAPEIT2(filter_writer & F, genhap_set & GH);

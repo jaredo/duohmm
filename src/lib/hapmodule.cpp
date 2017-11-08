@@ -62,6 +62,17 @@ int Haplotypes::imputeAll()
   return count;
 }
 
+
+void Haplotypes::impute(string const & id,int pos_index)
+{
+    int sample_index = idlook[id];
+    float i0= impute(sample_index*2,pos_index);
+    float i1= impute(sample_index*2+1,pos_index);
+    H[sample_index*2][pos_index] = round(i0);
+    H[sample_index*2+1][pos_index] = round(i1);    
+}
+				 
+    
 int Haplotypes::imputeSample(string const & id)
 {
   int sample_index = idlook[id];
@@ -294,8 +305,7 @@ Haplotypes::Haplotypes(filter_writer &F, genhap_set &GH)
 
   nhap = GH.vecG.size() * 2;
   nsnp = GH.mapG->size();
-  if (DEBUG > 0)
-    cout << nhap << " haps and " << nsnp << " snps" << endl;
+  if (DEBUG > 0)    cout << nhap << " haps and " << nsnp << " snps" << endl;
   //this bit orders the data...i think
   for (int i = 0; i < GH.vecG.size(); i++)
   {

@@ -82,6 +82,7 @@ int pedhap::phase(string child)
   assert(ped->sampleinfo.count(child));
   string dad = ped->sampleinfo[child].dad;
   string mum = ped->sampleinfo[child].mum;
+  string parent="";
   if (VERBOSE > 0)
   {
     cout << "Phasing " << child << " - " << dad << " - " << mum << endl;
@@ -126,12 +127,14 @@ int pedhap::phase(string child)
   { //duos
     if (dad.compare("0") != 0)
     {
+	parent=dad;
       p = haps->getHap(dad);
       duo->setHaps(p, c, "1");
       key = make_pair(dad, child);
     }
     if (mum.compare("0") != 0)
     {
+	parent=mum;
       p = haps->getHap(mum);
       duo->setHaps(p, c, "2");
       key = make_pair(mum, child);
@@ -171,10 +174,16 @@ int pedhap::phase(string child)
 
 #ifdef SHAPEIT
       //re-impute missing genotypes
+      //when entire trio/duo is missing. re-impute parents from population
+      if ((*kid_missing)[l] && (*dad_missing)[l] && (*mum_missing)[l])
+      {
+	  haps->impute(dad,l);
+	  haps->impute(mum,l);	  
+      }
+      
       bitset<3> b(s);
       int mum_src = b[1];
-      int dad_src = b[2];
-
+      int dad_src = b[2];	  
       //always impute a missing child directly from parents
       if ((*kid_missing)[l])
       {
@@ -222,18 +231,22 @@ int pedhap::phase(string child)
 #ifdef SHAPEIT //re-impute missing genotypes
     for (int l = 0; l < nsnp; l++)
     {
-      unsigned char s = duo->stateseq[l];
-      bitset<2> b(s);
-      int src = b[1];
-      int dst = b[0];
-      if ((*kid_missing)[l])
-      {
-        c[dst][l] = p[src][l];
-      }
-      if ((*parent_missing)[l])
-      {
-        p[src][l] = c[dst][l];
-      }
+	if ((*kid_missing)[l] && (*parent_missing)[l])
+	{
+	    haps->impute(parent,l);
+	}
+	unsigned char s = duo->stateseq[l];
+	bitset<2> b(s);
+	int src = b[1];
+	int dst = b[0];
+	if ((*kid_missing)[l])
+	{
+	    c[dst][l] = p[src][l];
+	}
+	if((*parent_missing)[l])
+	{
+	    p[src][l] = c[dst][l];
+	}
     }
 #endif
   }
@@ -485,3 +498,4 @@ int pedhap::recombinationMap(string outfile)
   }
   return 0;
 }
+
