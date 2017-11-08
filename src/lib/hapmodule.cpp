@@ -70,8 +70,6 @@ int Haplotypes::imputeSample(string const & id)
   {
       if(_missing[sample_index][i])
       {
-          int g0=H[sample_index*2][i];
-          int g1=H[sample_index*2+1][i];
           float i0= impute(sample_index*2,i);
           float i1= impute(sample_index*2+1,i);
           H[sample_index*2][i] = round(i0);
