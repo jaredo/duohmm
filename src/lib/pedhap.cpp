@@ -77,6 +77,7 @@ pedhap::~pedhap()
 
 int pedhap::phase(string child)
 {
+    bool impute_missing_genotypes=false; //re-impute missing genotypes with a simple haploid imputation model (this is worse than shapeit's internal imputation)
   if (DEBUG > 0)
     cout << child << endl;
   assert(ped->sampleinfo.count(child));
@@ -175,10 +176,14 @@ int pedhap::phase(string child)
 #ifdef SHAPEIT
       //re-impute missing genotypes
       //when entire trio/duo is missing. re-impute parents from population
-      if ((*kid_missing)[l] && (*dad_missing)[l])
-	  haps->impute(dad,l);
-      if ((*kid_missing)[l] && (*mum_missing)[l])
-	  haps->impute(mum,l);	  
+
+      if(impute_missing_genotypes)
+      {
+	  if ((*kid_missing)[l] && (*dad_missing)[l])
+	      haps->impute(dad,l);
+	  if ((*kid_missing)[l] && (*mum_missing)[l])
+	      haps->impute(mum,l);	  
+      }
       
       bitset<3> b(s);
       int mum_src = b[1];
@@ -497,4 +502,5 @@ int pedhap::recombinationMap(string outfile)
   }
   return 0;
 }
+
 
