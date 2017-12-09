@@ -93,13 +93,13 @@ int pedhap::phase(string child)
   vector<bool> *kid_missing = haps->getMissing(child);
   vector<bool> *dad_missing = haps->getMissing(dad);
   vector<bool> *mum_missing = haps->getMissing(mum);
-  vector<bool> *parent_missing = nullptr;
+  vector<bool> *parent_missing = NULL;
   if (mum.compare("0") != 0)
     parent_missing = mum_missing;
   if (dad.compare("0") != 0)
     parent_missing = dad_missing;
 #endif
-  vector<bool> *d = nullptr, *m = nullptr, *p = nullptr;
+  vector<bool> *d = NULL, *m = NULL, *p = NULL;
   vector<bool> *c = haps->getHap(child);
   pair<string, string> key, key1, key2;
 

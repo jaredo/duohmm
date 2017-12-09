@@ -406,7 +406,7 @@ vector<bool> *Haplotypes::getMissing(string &id)
   }
   else
   {
-    return nullptr;
+    return NULL;
   }
 }
 
