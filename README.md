@@ -7,6 +7,8 @@ Documentation:
 Build:
 
 ```
+export BOOST_ROOT=/my/boost/installation/
+
 git clone https://github.com/jaredo/duohmm.git
 cd duohmm/src
 make -j 4
