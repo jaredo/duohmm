@@ -77,7 +77,7 @@ pedhap::~pedhap()
 
 int pedhap::phase(string child)
 {
-    bool impute_missing_genotypes=false; //re-impute missing genotypes with a simple haploid imputation model (this is worse than shapeit's internal imputation)
+  bool impute_missing_genotypes=false; //re-impute missing genotypes with a simple haploid imputation model
   if (DEBUG > 0)
     cout << child << endl;
   assert(ped->sampleinfo.count(child));
