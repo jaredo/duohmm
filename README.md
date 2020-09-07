@@ -11,9 +11,16 @@ Publication:
 Build:
 
 ```
-export BOOST_ROOT=/my/boost/installation/
+export BOOST_ROOT=/my/boost/installation/ ##optional
 
 git clone https://github.com/jaredo/duohmm.git
-cd duohmm/src
+cd duohmm/
 make -j 4
+```
+
+Docker:
+
+```
+make clean
+docker build -t duohmm .
 ```
